@@ -1,5 +1,7 @@
 universe u
 
+open classical
+
 theorem not_or_and_not : ∀ { p q : Prop}, ¬ (p ∨ q) → ¬ p ∧ ¬ q :=
 begin
   intros p q h,
@@ -33,4 +35,54 @@ begin
   apply h₂,
 end
 
-theorem not_implies (p q : Prop) : ¬ (p → q) ↔ ¬p ∧ q := sorry
+theorem not_or_and_not_eqv (p q : Prop) : ¬ (p ∨ q) ↔ (¬p) ∧ (¬q) :=
+begin
+  split,
+  intro h,
+  split,
+  intro hp,
+  apply h,
+  left,
+  exact hp,
+  intro hq,
+  apply h,
+  right,
+  exact hq,
+  intros h h₁,
+  cases h with np nq,
+  cases h₁,
+  exact np h₁,
+  exact nq h₁,
+end
+
+theorem implies_or_not (p q : Prop) : p → q ↔ (¬p) ∨ q :=
+begin
+  split,
+  intro hpq,
+  by_cases p,
+  right,
+  exact hpq h,
+  left,
+  exact h,
+  intro h,
+  intro hp,
+  cases h,
+  apply false.elim,
+  apply h,
+  apply hp,
+  exact h,
+end
+
+theorem not_not_eqv (p : Prop) : ¬¬ p ↔ p :=
+begin
+  split,
+  apply not_not,
+  apply not_not_intro,
+end 
+
+theorem not_implies (p q : Prop) : ¬ (p → q) ↔ p ∧ ¬q :=
+begin
+  rw implies_or_not,
+  rw not_or_and_not_eqv,
+  rw not_not_eqv,
+end

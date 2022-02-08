@@ -495,7 +495,6 @@ begin
   exact hxinA,
 end
 
-
 theorem exists_not_of_not_exists {α :Sort u} {p : α → Prop} : (¬(∀ x : α , p x)) → ∃ x : α , ¬(p x) :=
 begin
   intro h₁,
@@ -508,8 +507,6 @@ begin
   apply h₂,
 end
 
-
-
 theorem deMorgenInter {X : Type u} (C : set (set X)) :  univ \ (⋂₀ C) = ⋃₀ image (λ A, univ \ A) C := 
 begin
   apply subset_antisymmetric,
@@ -519,6 +516,34 @@ begin
   have h₁ := exists_not_of_not_exists nxinI,
   simp at h₁,
   cases h₁ with A hA,
+  rw not_implies at hA,
+  cases hA with hAinC hxninA,
+  existsi univ \ A,
+  split,
+  existsi A,
+  split,
+  exact hAinC,
+  refl,
+  split,
+  trivial,
+  exact hxninA,
+  intros x hx,
+  cases hx with A hA,
+  cases hA with hAdiff hxinA,
+  cases hAdiff with B hB,
+  cases hB with hBinC hB,
+  simp at hB,
+  rw ← hB at hxinA,
+  split,
+  trivial,
+  simp,
+  intro hx,
+  have hcon : x ∈ B,
+    apply hx,
+    exact hBinC,
+  cases hxinA with h₁ h₂,
+  apply h₂,
+  exact hcon,
 end
 
 /-
