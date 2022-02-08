@@ -218,5 +218,4 @@ end
 
 def ring_isomorphism {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] (φ : R₁ →ᵣ R₂) : Prop := ∃ ψ : R₂ →ᵣ R₁, (ψ ∘ᵣ φ) = idᵣ ∧ (φ ∘ᵣ ψ) = idᵣ 
 
-
 end comm_ring

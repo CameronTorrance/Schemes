@@ -1,4 +1,5 @@
 import algebra.comm_rings.basic
+import misc.set
 
 namespace comm_ring
 
@@ -123,5 +124,36 @@ begin
   exact h,
 end
 
+lemma ideal_containing_unit_is_univ {R : Type u} [comm_ring R] (I : ideal R) : ∀ {x : R}, unit x → x ∈ I.body → ↑I = @univ R :=
+begin
+  intros x hxunit hxinI,
+  apply subset_antisymmetric,
+  split,
+  intros _ _,
+  trivial,
+  intros y _,
+  cases hxunit with a ha,
+  have haxinI : a * x ∈ ↑I,
+    apply I.mul_absorb,
+    exact hxinI,
+  rw ha at haxinI,
+  have ha1inI : y * 1 ∈ ↑I,
+    apply I.mul_absorb,
+    exact haxinI,
+  rw mul_one at ha1inI,
+  exact ha1inI,
+end
+
+lemma unit_not_in_proper_ideal {R : Type u} [comm_ring R] : ∀ {x : R}, ∀ {I : proper_ideal R}, unit x → x ∉ I.body :=
+begin
+  intros x I hx h,
+  apply I.proper,
+  let J : ideal R := proper_ideals_are_ideals I,
+  have trv : I.body = J.body := rfl,
+  rw trv,
+  apply ideal_containing_unit_is_univ J,
+  exact hx,
+  exact h,
+end
 
 end comm_ring

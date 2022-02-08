@@ -1,3 +1,5 @@
+universe u
+
 theorem not_or_and_not : ∀ { p q : Prop}, ¬ (p ∨ q) → ¬ p ∧ ¬ q :=
 begin
   intros p q h,
