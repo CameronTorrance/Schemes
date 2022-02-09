@@ -1,5 +1,8 @@
 namespace comm_ring
+
 universes u v w
+
+open list
 
 class comm_ring (R: Type u) extends has_add R, has_mul R, has_one R, has_zero R, has_neg R :=
   (add_assoc : ∀ a b c : R, a + (b + c) = (a + b) + c)
@@ -114,10 +117,44 @@ begin
 end 
 
 def pow {R : Type u} [comm_ring R] : R → ℕ → R 
-  | r nat.zero     := r 
+  | r nat.zero     := 1
   | r (nat.succ n) := r * (pow r n)
 
 infixr `^` := pow
+
+def nat_to_ring (R :Type u) [comm_ring R] : ℕ → R 
+  | 0            := 0
+  | (nat.succ n) := 1 + nat_to_ring n 
+
+def binomial_coeffients : ℕ → ℕ → ℕ
+  | _ 0                       := 1
+  | 0 _                       := 1
+  | (nat.succ n) (nat.succ k) := (binomial_coeffients n (nat.succ k)) + (binomial_coeffients n k)
+
+
+def sum_list {R : Type u} [comm_ring R] : list R → R := foldr (λ a b : R, a + b) 0
+
+def scale_list {R : Type u} [comm_ring R] : R → list R → list R := λ a, map (λ b: R, a * b)
+
+def add_lists {R : Type u} [comm_ring R] : list R → list R → list R 
+  | (a :: as) (b :: bs) := (a + b) :: (add_lists as bs)
+  | [] bs               := bs 
+  | as []               := as 
+
+notation `Σ₀` : 110 := sum_list
+
+theorem mul_dis_general {R : Type u} [comm_ring R] : ∀ (a : R) (l : list R), a * (Σ₀ l) = Σ₀ (scale_list a l) :=
+begin
+  intros a l,
+  induction l with b l hl,
+  have trv₁ : (Σ₀ (@nil R)) = 0 := rfl,
+  have trv₂ : scale_list a nil = nil := rfl,
+  rw [trv₂,trv₁,mul_zero],
+  have trv₁ : Σ₀ (b::l) = b + Σ₀ l := rfl,
+  rw [trv₁,mul_dis,hl],
+  refl, 
+end
+
 
 inductive linear_combination {R : Type u} [comm_ring R] (S₁ : set R) (S₂ : set R): R → Prop 
   | empty_sum : linear_combination 0 
@@ -206,7 +243,7 @@ begin
   exact h,
 end
 
-theorem ring_hom_equality{R₁ : Type u} [comm_ring R₁] {R₂ : Type v} [comm_ring R₂] {φ₁ φ₂: R₁ →ᵣ R₂} 
+theorem ring_hom_equality {R₁ : Type u} [comm_ring R₁] {R₂ : Type v} [comm_ring R₂] {φ₁ φ₂: R₁ →ᵣ R₂} 
 : (φ₁.map) = (φ₂.map) → φ₁ = φ₂ :=
 begin
   intro h,
@@ -217,5 +254,19 @@ begin
 end
 
 def ring_isomorphism {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] (φ : R₁ →ᵣ R₂) : Prop := ∃ ψ : R₂ →ᵣ R₁, (ψ ∘ᵣ φ) = idᵣ ∧ (φ ∘ᵣ ψ) = idᵣ 
+
+theorem id_hom_left_comp {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] (φ : R₁ →ᵣ R₂)
+  : (idᵣ ∘ᵣ φ) = φ :=
+begin
+  apply ring_hom_equality,
+  refl,
+end
+
+theorem id_hom_right_comp {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] (φ : R₁ →ᵣ R₂)
+  : (φ ∘ᵣ idᵣ) = φ :=
+begin
+  apply ring_hom_equality,
+  refl,
+end
 
 end comm_ring
