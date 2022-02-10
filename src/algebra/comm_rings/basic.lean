@@ -143,7 +143,7 @@ def add_lists {R : Type u} [comm_ring R] : list R → list R → list R
 
 notation `Σ₀` : 110 := sum_list
 
-theorem mul_dis_general {R : Type u} [comm_ring R] : ∀ (a : R) (l : list R), a * (Σ₀ l) = Σ₀ (scale_list a l) :=
+theorem mul_dis_finite_sum {R : Type u} [comm_ring R] : ∀ (a : R) (l : list R), a * (Σ₀ l) = Σ₀ (scale_list a l) :=
 begin
   intros a l,
   induction l with b l hl,
@@ -155,6 +155,8 @@ begin
   refl, 
 end
 
+def binomial_expansion {R : Type u} [comm_ring R] : R → R → ℕ → ℕ → R 
+  | a b n k := nat_to_ring R (binomial_coeffients n k) * a^(n - k) * b^k
 
 inductive linear_combination {R : Type u} [comm_ring R] (S₁ : set R) (S₂ : set R): R → Prop 
   | empty_sum : linear_combination 0 
@@ -169,6 +171,8 @@ structure ring_hom (R₁: Type u) (R₂ : Type v) [comm_ring R₁] [comm_ring R�
 infixr `→ᵣ`:25 := ring_hom
 
 instance ring_hom_to_function {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] : has_coe_to_fun (R₁ →ᵣ R₂) (λ _, R₁ → R₂) := ⟨λ φ, φ.map⟩ 
+
+  
 
 def idᵣ {R : Type u} [comm_ring R] : R →ᵣ R := 
   {
