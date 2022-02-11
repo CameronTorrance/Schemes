@@ -81,10 +81,10 @@ def zero_ring_hom (R : Type u) [l:comm_ring R] : R →ᵣ zero_ring:=
     prevs_one := rfl,
   }
 
-def finial_ring : (Σ R : Type u, comm_ring R) → Prop
+def final_ring : (Σ R : Type u, comm_ring R) → Prop
   | ⟨R,lR⟩ := ∀ pair : (Σ R' : Type u, comm_ring R'), ∃! ψ : @ring_hom pair.1  R  pair.2 lR , true
 
-def finial_ring_hom_id {Z : Type u} [lZ: comm_ring Z] : finial_ring ⟨Z,lZ⟩ → ∀ φ : Z →ᵣ Z, φ = idᵣ :=
+def final_ring_hom_id {Z : Type u} [lZ: comm_ring Z] : final_ring ⟨Z,lZ⟩ → ∀ φ : Z →ᵣ Z, φ = idᵣ :=
 begin
   intros upZ φ,
   cases upZ ⟨Z,lZ⟩ with φ_int hφ_int,
@@ -95,7 +95,7 @@ begin
   rw [h₁,h₂],
 end
 
-theorem zero_ring_is_final : finial_ring ⟨zero_ring,comm_ring.zero_ring_is_ring⟩ :=
+theorem zero_ring_is_final : final_ring ⟨zero_ring,comm_ring.zero_ring_is_ring⟩ :=
 begin
   intro pair,
   cases pair with R lR,
@@ -109,24 +109,27 @@ begin
   apply zero_ring_has_one_element,
 end
 
-theorem finial_ring_unquie {R₁ R₂ : Type u} [lR₁ : comm_ring R₁] [lR₂ : comm_ring R₂]
-  : finial_ring ⟨R₁,lR₁⟩ → finial_ring ⟨R₂,lR₂⟩ → ∃! ψ : R₁ →ᵣ R₂ , ring_isomorphism ψ :=
+
+theorem final_ring_unique {R₁ R₂: Type u} [lR₁ : comm_ring R₁] [lR₂ : comm_ring R₂]
+  : final_ring ⟨R₁,lR₁⟩  → final_ring ⟨R₂,lR₂⟩
+  → ∃! ψ : R₁ →ᵣ R₂ , ring_isomorphism ψ :=
 begin
-  intros R₁up R₂up,
+  intros R₁up R₂up ,
   cases R₁up ⟨R₂,lR₂⟩ with φ₁ hφ₁,
   cases R₂up ⟨R₁,lR₁⟩ with φ₂ hφ₂,
   existsi φ₂,
   split,
   existsi φ₁,
   split,
-  apply finial_ring_hom_id,
+  apply final_ring_hom_id,
   exact R₁up,
-  apply finial_ring_hom_id,
+  apply final_ring_hom_id,
   exact R₂up,
   simp,
   simp at hφ₂,
   intros ψ hψ,
   apply λ y, hφ₂ y trivial, 
 end
+
 
 end comm_ring

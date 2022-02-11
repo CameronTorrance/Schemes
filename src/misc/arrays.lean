@@ -21,6 +21,9 @@ def finType_to_nat : Π {n : ℕ} , finType n → ℕ
 | (nat.succ n) zero     := 0
 | (nat.succ n) (succ m) := nat.succ (finType_to_nat m) 
 
+
+instance finType_nat_coe {n : ℕ} : has_coe (finType n) (ℕ) := ⟨finType_to_nat⟩ 
+
 protected def finType.repr : Π {n : ℕ }, finType n → string
 | (nat.succ n) m         := repr (finType_to_nat m)
 
@@ -58,8 +61,21 @@ def matrix (T : Type u) (n : ℕ) (m : ℕ) := vec (vec T m) n
 
 namespace matrix
 
-def access { T : Type u} : Π (n m : ℕ), finType n → finType m → matrix T n m → T 
-  := λ n m i₁ i₂ M, vec.access i₂ (vec.access i₁ M)  
+def access { T : Type u} : Π {n m : ℕ}, finType n → finType m → matrix T n m → T 
+| n m i₁ i₂ M := vec.access i₂ (vec.access i₁ M)  
 
+def fun_to_matrix {T : Type u} (f : ℕ → ℕ → T) : Π n m : ℕ , matrix T n m
+| n m := vec.seq_to_vec (λ i₁, vec.seq_to_vec (λ i₂, f i₁ i₂) m) n
 
+/-
+theorem fun_to_matrix_entries {T : Type u} (f : ℕ → ℕ → T) : 
+  ∀ {n m : ℕ} (i₁ : finType n) (i₂ : finType m) , access i₁ i₂ (fun_to_matrix f n m) = f i₁ i₂ := 
+begin
+  intros n m i₁ i₂,
+  induction n with n hn, 
+  induction m with m hm,
+  induction i₁,
+
+end
+-/
 end matrix

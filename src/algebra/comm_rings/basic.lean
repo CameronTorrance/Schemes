@@ -1,6 +1,6 @@
 namespace comm_ring
 
-universes u v w
+universes u v w y
 
 open list
 
@@ -258,6 +258,14 @@ begin
 end
 
 def ring_isomorphism {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] (φ : R₁ →ᵣ R₂) : Prop := ∃ ψ : R₂ →ᵣ R₁, (ψ ∘ᵣ φ) = idᵣ ∧ (φ ∘ᵣ ψ) = idᵣ 
+
+theorem ring_comp_assoc {R₁ : Type u} {R₂ : Type v} {R₃ : Type w} {R₄ : Type y} [comm_ring R₁] 
+  [comm_ring R₂] [comm_ring R₃] [comm_ring R₄] (φ₁ : R₃ →ᵣ R₄) (φ₂ : R₂ →ᵣ R₃) (φ₃ : R₁ →ᵣ R₂) 
+  : (φ₁ ∘ᵣ (φ₂ ∘ᵣ φ₃)) = ((φ₁ ∘ᵣ φ₂) ∘ᵣ φ₃) :=
+begin
+  apply ring_hom_equality,
+  refl,
+end
 
 theorem id_hom_left_comp {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] (φ : R₁ →ᵣ R₂)
   : (idᵣ ∘ᵣ φ) = φ :=

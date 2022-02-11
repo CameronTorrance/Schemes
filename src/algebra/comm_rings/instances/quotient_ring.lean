@@ -369,9 +369,9 @@ begin
 end
 
 def quot_ring_universal_property {R: Type u} [lR:comm_ring R] (I : ideal R) 
-  : (Σ (Q : Type v) [lQ:comm_ring Q], (@ring_hom R Q lR lQ)) → Prop 
+  : (Σ (Q : Type u) [lQ:comm_ring Q], (@ring_hom R Q lR lQ)) → Prop 
   | ⟨Q,lQ,φ⟩ := (∀ r : R, r ∈ I.body → φ r = lQ.zero) ∧ 
-    (∀ pair : (Σ (Q : Type w) [lQ:comm_ring Q], (@ring_hom R Q lR lQ)),
+    (∀ pair : (Σ (Q : Type u) [lQ:comm_ring Q], (@ring_hom R Q lR lQ)),
     (∀ r : R, r ∈ I.body → pair.2.2 r = pair.2.1.zero) 
      → ∃! ψ : (@ring_hom Q pair.1 lQ pair.2.1) , pair.2.2 = (@ring_hom_comp R Q pair.1 lR lQ pair.2.1 ψ φ))
 
@@ -475,13 +475,54 @@ begin
   refl,
 end
 
-theorem universal_property_chars_quotient_ring {R : Type u} [lR:comm_ring R] {Q :Type v} [lQ : comm_ring Q] 
-  {Q' : Type w} [lQ' : comm_ring Q'] {I : ideal R} (φ : R →ᵣ Q) (φ' : R →ᵣ Q') 
-    : quot_ring_universal_property I ⟨Q,lQ,φ⟩ → quot_ring_universal_property I ⟨Q',lQ',φ'⟩
-    → ∃! ψ : Q →ᵣ Q', φ' = (ψ ∘ᵣ φ) ∧ (ring_isomorphism ψ) := 
+lemma quotient_ring_comp_hom_id {R Q: Type u} [comm_ring R] [lQ : comm_ring Q] {I : ideal R} {q : R →ᵣ Q} 
+  (Qup : quot_ring_universal_property I ⟨Q,lQ,q⟩) : ∀ φ : Q →ᵣ Q, q = (φ  ∘ᵣ q) → φ = idᵣ :=
+begin
+  intros φ hφ,
+  cases Qup with vanish abNon,
+  cases abNon ⟨Q,lQ,q⟩ vanish with ψ hψ,
+  dsimp at ψ,
+  dsimp at hψ,
+  cases hψ with hψ ψup,
+  have h₁ : φ = ψ,
+    apply ψup,
+    exact hφ,
+  have h₂ : idᵣ = ψ,
+    apply ψup,
+    symmetry,
+    exact id_hom_left_comp q,
+  rw [h₁,h₂],
+end
+
+theorem universal_property_chars_quotient_ring {R Q Q': Type u} [lR:comm_ring R] [lQ : comm_ring Q] 
+  [lQ' : comm_ring Q'] {I : ideal R} (q : R →ᵣ Q) (q' : R →ᵣ Q') 
+  : quot_ring_universal_property I ⟨Q,lQ,q⟩ → quot_ring_universal_property I ⟨Q',lQ',q'⟩
+  → ∃! ψ : Q →ᵣ Q', q' = (ψ ∘ᵣ q) ∧ (ring_isomorphism ψ) := 
 begin
   intros upQ upQ',
-  sorry,
+  cases upQ with vanish abNon,
+  cases upQ' with vanish' abNon',
+  cases abNon ⟨Q',lQ',q'⟩ vanish' with ψ hψ,
+  dsimp at ψ,
+  dsimp at hψ,
+  cases abNon' ⟨Q,lQ,q⟩ vanish with ψ' hψ',
+  dsimp at ψ',
+  dsimp at hψ',
+  cases hψ with hψ ψup,
+  cases hψ' with hψ' ψ'up,
+  existsi ψ,
+  split,
+  split,
+  exact hψ,
+  existsi ψ',
+  split,
+  apply quotient_ring_comp_hom_id ⟨vanish,abNon⟩,
+  rw [← ring_comp_assoc,← hψ,← hψ'],
+  apply quotient_ring_comp_hom_id ⟨vanish',abNon'⟩,
+  rw [← ring_comp_assoc,← hψ',← hψ],
+  intros ψint hψint,
+  apply ψup,
+  exact and.left hψint,
 end
 
 end comm_ring
