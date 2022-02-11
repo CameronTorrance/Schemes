@@ -357,4 +357,7 @@ def preimage_of_ideal {R₁ : Type u} [l:comm_ring R₁] {R₂ : Type v} [comm_r
 
 def ker {R₁ : Type u} [l:comm_ring R₁] {R₂ : Type v} [comm_ring R₂] (φ : R₁ →ᵣ R₂) : ideal R₁ := preimage_of_ideal φ (zero_ideal R₂) 
 
+
+
+
 end comm_ring

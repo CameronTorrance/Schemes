@@ -120,17 +120,24 @@ def pow {R : Type u} [comm_ring R] : R → ℕ → R
   | r nat.zero     := 1
   | r (nat.succ n) := r * (pow r n)
 
-infixr `^` := pow
+instance ring_has_pow {R: Type u} [comm_ring R] : has_pow R ℕ := ⟨pow⟩
+
+lemma power_of_one {R : Type u} [comm_ring R] : ∀ a : R, a^1 = a :=
+begin
+  intro a,
+  have trv : a^1 = a * 1 := rfl,
+  rw [trv,mul_one],
+end
+
+lemma power_of_zero {R : Type u} [comm_ring R] : ∀ a : R, a^0 = 1 :=
+begin
+  intro a,
+  refl,
+end
 
 def nat_to_ring (R :Type u) [comm_ring R] : ℕ → R 
   | 0            := 0
   | (nat.succ n) := 1 + nat_to_ring n 
-
-def binomial_coeffients : ℕ → ℕ → ℕ
-  | _ 0                       := 1
-  | 0 _                       := 1
-  | (nat.succ n) (nat.succ k) := (binomial_coeffients n (nat.succ k)) + (binomial_coeffients n k)
-
 
 def sum_list {R : Type u} [comm_ring R] : list R → R := foldr (λ a b : R, a + b) 0
 
@@ -155,9 +162,6 @@ begin
   refl, 
 end
 
-def binomial_expansion {R : Type u} [comm_ring R] : R → R → ℕ → ℕ → R 
-  | a b n k := nat_to_ring R (binomial_coeffients n k) * a^(n - k) * b^k
-
 inductive linear_combination {R : Type u} [comm_ring R] (S₁ : set R) (S₂ : set R): R → Prop 
   | empty_sum : linear_combination 0 
   | add_term (x : R) : ∀ s₁ s₂ l : R, s₁ ∈ S₁ → s₂ ∈ S₂ → linear_combination l → x = s₁ * s₂ + l → linear_combination x
@@ -171,8 +175,6 @@ structure ring_hom (R₁: Type u) (R₂ : Type v) [comm_ring R₁] [comm_ring R�
 infixr `→ᵣ`:25 := ring_hom
 
 instance ring_hom_to_function {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] : has_coe_to_fun (R₁ →ᵣ R₂) (λ _, R₁ → R₂) := ⟨λ φ, φ.map⟩ 
-
-  
 
 def idᵣ {R : Type u} [comm_ring R] : R →ᵣ R := 
   {
