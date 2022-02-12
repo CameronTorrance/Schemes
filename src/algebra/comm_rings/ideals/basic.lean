@@ -34,6 +34,8 @@ begin
   exact I.mul_absorb,
 end
 
+instance proper_ideals_to_ideals {R : Type u} [comm_ring R] : has_coe (proper_ideal R) (ideal R) := ⟨proper_ideals_are_ideals⟩ 
+
 structure Spec (R : Type u) [l:comm_ring R] :=
   (body : set R)
   (contains_zero : l.zero ∈ body)

@@ -1,8 +1,70 @@
 import algebra.comm_rings.basic
+import misc.set
 
 namespace comm_ring
 
 universes u v
+
+def Im {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] (φ : R₁ →ᵣ R₂)
+  := subtype (λ y : R₂, ∃ x : R₁, y = φ x) 
+
+def Im_add {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] (φ : R₁ →ᵣ R₂) 
+  : Im φ → Im φ → Im φ :=
+begin
+  intros yu₁ yu₂,
+  cases yu₁ with y₁ hy₁,
+  cases yu₂ with y₂ hy₂,
+  existsi y₁ + y₂,
+  cases hy₁ with x₁ hx₁,
+  cases hy₂ with x₂ hx₂,
+  existsi x₁ + x₂,
+  rw [hx₁,hx₂],
+  symmetry,
+  exact φ.prevs_add x₁ x₂,
+end
+
+instance image_add {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] (φ : R₁ →ᵣ R₂)
+  : has_add (Im φ) := ⟨Im_add φ⟩ 
+
+def Im_mul {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] (φ : R₁ →ᵣ R₂) 
+  : Im φ → Im φ → Im φ :=
+begin
+  intros yu₁ yu₂,
+  cases yu₁ with y₁ hy₁,
+  cases yu₂ with y₂ hy₂,
+  existsi y₁ * y₂,
+  cases hy₁ with x₁ hx₁,
+  cases hy₂ with x₂ hx₂,
+  existsi x₁ * x₂,
+  rw [hx₁,hx₂],
+  symmetry,
+  exact φ.prevs_mul x₁ x₂,
+end
+
+instance image_mul {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] (φ : R₁ →ᵣ R₂)
+  : has_mul (Im φ) := ⟨Im_mul φ⟩  
+
+def Im_one {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] (φ : R₁ →ᵣ R₂) : Im φ :=
+begin
+  existsi (1 : R₂),
+  existsi (1 : R₁),
+  symmetry,
+  exact φ.prevs_one,
+end
+
+instance image_one {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] (φ : R₁ →ᵣ R₂) 
+  : has_one (Im φ) := ⟨Im_one φ⟩
+
+def Im_zero {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] (φ : R₁ →ᵣ R₂) : Im φ :=
+begin
+  existsi (0 : R₂),
+  existsi (0 : R₁),
+  symmetry,
+  exact ring_hom_preserves_zero φ,
+end
+
+instance image_zero {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] (φ : R₁ →ᵣ R₂)
+  : has_zero (Im φ) := ⟨Im_zero φ⟩
 
 instance int_is_ring : comm_ring ℤ :=
 begin
@@ -21,6 +83,48 @@ begin
   exact int.distrib_left,
 end
 
+theorem Im_add_assoc {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] (φ : R₁ →ᵣ R₂)
+  : ∀ a b c : Im φ, a + (b + c) = (a + b) + c :=
+begin
+  intros a b c,
+  apply set.val_injective,
+  cases a,
+  cases b,
+  cases c,
+  exact add_assoc a_val b_val c_val,
+end
+
+theorem Im_add_comm {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] (φ : R₁ →ᵣ R₂)
+  : ∀ a b : Im φ, a + b  = b + a :=
+begin
+  intros a b ,
+  apply set.val_injective,
+  cases a,
+  cases b,
+  exact add_comm a_val b_val,
+end
+
+theorem Im_mul_assoc {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] (φ : R₁ →ᵣ R₂)
+  : ∀ a b c : Im φ, a * (b * c) = (a * b) * c :=
+begin
+  intros a b c,
+  apply set.val_injective,
+  cases a,
+  cases b,
+  cases c,
+  exact mul_assoc a_val b_val c_val,
+end
+
+theorem Im_mul_comm {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] (φ : R₁ →ᵣ R₂)
+  : ∀ a b : Im φ, a * b  = b * a :=
+begin
+  intros a b ,
+  apply set.val_injective,
+  cases a,
+  cases b,
+  exact mul_comm a_val b_val,
+end
+
 def initial_ring : (Σ R : Type u, comm_ring R) → Prop
   | ⟨R,lR⟩ := ∀ pair : (Σ R' : Type u, comm_ring R'), ∃! ψ : @ring_hom R pair.1 lR pair.2, true
 
@@ -36,7 +140,6 @@ theorem int_hom_prevs_zero {R : Type u} [lR:comm_ring R] : int_hom_map R int.zer
 
 inductive zero_ring : Type
   | elm : zero_ring
-
 
 theorem zero_ring_has_one_element : ∀ x : zero_ring, x = zero_ring.elm :=
 begin
@@ -71,7 +174,6 @@ instance zero_ring_is_ring : comm_ring zero_ring :=
     neg := λ _, zero_ring.elm,
     minus_inverse := λ _, rfl,
   }
-
 
 def zero_ring_hom (R : Type u) [l:comm_ring R] : R →ᵣ zero_ring:=
   {
@@ -109,7 +211,6 @@ begin
   apply zero_ring_has_one_element,
 end
 
-
 theorem final_ring_unique {R₁ R₂: Type u} [lR₁ : comm_ring R₁] [lR₂ : comm_ring R₂]
   : final_ring ⟨R₁,lR₁⟩  → final_ring ⟨R₂,lR₂⟩
   → ∃! ψ : R₁ →ᵣ R₂ , ring_isomorphism ψ :=
@@ -130,6 +231,5 @@ begin
   intros ψ hψ,
   apply λ y, hφ₂ y trivial, 
 end
-
 
 end comm_ring

@@ -298,6 +298,78 @@ def sum_of_ideals {R : Type u} [comm_ring R] (I₁ : ideal R) (I₂ : ideal R) :
 
 instance add_ideals {R : Type u} [comm_ring R] (I₁ : ideal R) (I₂ : ideal R) : has_add (ideal R) := ⟨λ I₁ I₂, sum_of_ideals I₁ I₂⟩ 
 
+theorem intersection_of_ideals_add_closure {R : Type u} [comm_ring R] (C : set (ideal R)) 
+  : ∀ a b : R, (a ∈ ⋂₀ (image (λ I : ideal R, I.body) C)) → (b ∈ ⋂₀ (image (λ I : ideal R, I.body) C))
+    → (a + b) ∈ ⋂₀ (image (λ I : ideal R, I.body) C) :=
+begin
+  intros a b ha hb,
+  intros A hA,
+  have hainA := ha A hA,
+  have hbinA := hb A hA,
+  cases hA with I hI,
+  cases hI with hIinC hrw,
+  simp at hrw,
+  rw ← hrw at hainA,
+  rw ← hrw at hbinA,
+  rw ← hrw,
+  apply I.add_closure,
+  exact hainA,
+  exact hbinA,
+end
+
+theorem intersection_of_ideals_contains_zero {R : Type u} [comm_ring R] (C : set (ideal R)) 
+  : (0: R) ∈ ⋂₀ (image (λ I : ideal R, I.body) C) :=
+begin
+  intros A hA,
+  cases hA with I hI,
+  cases hI with hIinC hrw,
+  simp at hrw,
+  rw ← hrw,
+  apply I.contains_zero,
+end
+
+theorem intersection_of_ideals_mul_absorb {R : Type u} [comm_ring R] (C : set (ideal R)) 
+  : ∀ (r : R) {i}, i ∈ ⋂₀ (image (λ I : ideal R, I.body) C) → (r * i) ∈ ⋂₀ (image (λ I : ideal R, I.body) C) :=
+begin
+  intros r i hi A hA,
+  have hiinA := hi A hA,
+  cases hA with I hI,
+  cases hI with hIinC hrw,
+  simp at hrw,
+  rw ← hrw,
+  apply I.mul_absorb,
+  rw hrw,
+  exact hiinA,
+end
+
+theorem intersection_of_ideals_minus_closure {R : Type u} [comm_ring R] (C : set (ideal R))
+  : ∀ i, i ∈  ⋂₀ (image (λ I : ideal R, I.body) C) → -i ∈  ⋂₀ (image (λ I : ideal R, I.body) C) :=
+begin
+  intros i hi A hA,
+  have hiinA := hi A hA,
+  cases hA with I hI,
+  cases hI with hIinC hrw,
+  simp at hrw,
+  rw ← hrw,
+  apply I.minus_closure,
+  rw hrw,
+  exact hiinA,
+end
+
+
+def intersection_of_ideals {R : Type u} [comm_ring R] (C : set (ideal R)) : ideal R :=
+begin
+  split,
+  exact intersection_of_ideals_contains_zero C,
+  exact intersection_of_ideals_minus_closure C,
+  exact intersection_of_ideals_add_closure C,
+  exact intersection_of_ideals_mul_absorb C,
+end
+
+prefix `⋂₀`:110 := intersection_of_ideals
+
+
+
 def preimage_set {R₁ : Type u} [comm_ring R₁] {R₂ : Type v} [comm_ring R₂] (φ : R₁ →ᵣ R₂) (I : ideal R₂) : set R₁ :=
   λ r : R₁, φ r ∈ I.body 
 

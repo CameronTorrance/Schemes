@@ -1,8 +1,4 @@
-namespace comm_ring
-
 universes u v w y
-
-open list
 
 class comm_ring (R: Type u) extends has_add R, has_mul R, has_one R, has_zero R, has_neg R :=
   (add_assoc : ∀ a b c : R, a + (b + c) = (a + b) + c)
@@ -14,14 +10,10 @@ class comm_ring (R: Type u) extends has_add R, has_mul R, has_one R, has_zero R,
   (mul_one : ∀ a : R, a * 1 = a)
   (mul_dis : ∀ a b c : R, a * (b + c) = a * b + a * c)
 
-theorem add_assoc {R: Type u} [l : comm_ring R] : ∀ a b c : R, a + (b + c) = (a + b) + c := l.add_assoc
-theorem add_comm {R: Type u} [l: comm_ring R] : ∀ a b : R, a + b = b + a := l.add_comm
-theorem add_zero {R: Type u} [l: comm_ring R] : ∀ a : R, a + 0 = a := l.add_zero
-theorem minus_inverse {R: Type u} [l: comm_ring R] : ∀ a : R, a + -a = 0 := l.minus_inverse
-theorem mul_assoc {R: Type u} [l: comm_ring R] : ∀ a b c : R, a * (b * c) = (a * b) * c := l.mul_assoc
-theorem mul_comm {R: Type u} [l: comm_ring R] : ∀ a b : R, a * b = b * a := l.mul_comm
-theorem mul_one {R: Type u} [l: comm_ring R] : ∀ a : R, a * 1 = a := l.mul_one
-theorem mul_dis {R: Type u} [l: comm_ring R] : ∀ a b c : R, a * (b + c) = a * b + a * c := l.mul_dis 
+namespace comm_ring
+
+open list
+
 
 /-
   Trival algebraic identities. 
