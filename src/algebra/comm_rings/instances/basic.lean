@@ -66,22 +66,21 @@ end
 instance image_zero {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] (φ : R₁ →ᵣ R₂)
   : has_zero (Im φ) := ⟨Im_zero φ⟩
 
-instance int_is_ring : comm_ring ℤ :=
+def Im_minus {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] (φ : R₁ →ᵣ R₂)
+  : Im φ → Im φ :=
 begin
-  split,
-  intros a b c,
+  intro a,
+  cases a with y hy,
+  existsi -y,
+  cases hy with x hx,
+  existsi -x,
   symmetry,
-  exact int.add_assoc a b c,
-  exact int.add_comm,
-  exact int.add_zero,
-  exact int.add_right_neg,
-  intros a b c,
-  symmetry,
-  exact int.mul_assoc a b c,
-  exact int.mul_comm,
-  exact int.mul_one,
-  exact int.distrib_left,
+  rw hx,
+  apply minus_commutes_with_hom,
 end
+
+instance Im_neg {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] (φ : R₁ →ᵣ R₂)
+  : has_neg (Im φ) := ⟨Im_minus φ⟩ 
 
 theorem Im_add_assoc {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] (φ : R₁ →ᵣ R₂)
   : ∀ a b c : Im φ, a + (b + c) = (a + b) + c :=
@@ -97,11 +96,29 @@ end
 theorem Im_add_comm {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] (φ : R₁ →ᵣ R₂)
   : ∀ a b : Im φ, a + b  = b + a :=
 begin
-  intros a b ,
+  intros a b,
   apply set.val_injective,
   cases a,
   cases b,
   exact add_comm a_val b_val,
+end
+
+theorem Im_add_zero {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] (φ : R₁ →ᵣ R₂)
+  : ∀ a : Im φ , a + 0 = a := 
+begin
+  intro a,
+  apply set.val_injective,
+  cases a,
+  exact add_zero a_val,
+end
+
+theorem Im_minus_inverse {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] (φ : R₁ →ᵣ R₂)
+  : ∀ a : Im φ , a + -a = 0 := 
+begin
+  intro a,
+  apply set.val_injective,
+  cases a,
+  exact minus_inverse a_val,
 end
 
 theorem Im_mul_assoc {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] (φ : R₁ →ᵣ R₂)
@@ -123,6 +140,78 @@ begin
   cases a,
   cases b,
   exact mul_comm a_val b_val,
+end
+
+theorem Im_mul_one {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] (φ : R₁ →ᵣ R₂)
+  : ∀ a : Im φ , a * 1 = a := 
+begin
+  intro a,
+  apply set.val_injective,
+  cases a,
+  exact mul_one a_val,
+end
+
+theorem Im_mul_dis {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] (φ : R₁ →ᵣ R₂)
+  : ∀ a b c : Im φ, a * (b + c) = a * b + a * c :=
+begin
+  intros a b c,
+  apply set.val_injective,
+  cases a,
+  cases b,
+  cases c,
+  exact mul_dis a_val b_val c_val,
+end
+
+instance image_is_ring {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] (φ : R₁ →ᵣ R₂)
+  : comm_ring (Im φ) :=
+begin
+  split,
+  exact Im_add_assoc φ,
+  exact Im_add_comm φ,
+  exact Im_add_zero φ,
+  exact Im_minus_inverse φ,
+  exact Im_mul_assoc φ,
+  exact Im_mul_comm φ,
+  exact Im_mul_one φ,
+  exact Im_mul_dis φ,
+end
+
+def im_trival_hom_in {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] (φ : R₁ →ᵣ R₂)
+  : R₁ →ᵣ Im φ :=
+{
+  map := 
+    by {intro x,
+        existsi φ x,
+        existsi x,
+        refl,},
+  prevs_add := 
+    by { intros a b,
+         apply set.val_injective,
+         exact φ.prevs_add a b,},
+  prevs_mul := 
+    by { intros a b,
+         apply set.val_injective,
+         exact φ.prevs_mul a b,},
+  prevs_one :=
+    by { apply set.val_injective,
+         exact φ.prevs_one},
+}
+
+instance int_is_ring : comm_ring ℤ :=
+begin
+  split,
+  intros a b c,
+  symmetry,
+  exact int.add_assoc a b c,
+  exact int.add_comm,
+  exact int.add_zero,
+  exact int.add_right_neg,
+  intros a b c,
+  symmetry,
+  exact int.mul_assoc a b c,
+  exact int.mul_comm,
+  exact int.mul_one,
+  exact int.distrib_left,
 end
 
 def initial_ring : (Σ R : Type u, comm_ring R) → Prop

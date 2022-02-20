@@ -73,7 +73,9 @@ def is_prime {R: Type u} [comm_ring R] : proper_ideal R → Prop
 def is_maximal {R : Type u} [comm_ring R] : proper_ideal R → Prop 
   := λ I : proper_ideal R, ∀ J : ideal R, I.body ⊆ J → ↑J = I.body ∨ J.body = univ 
 
-def ideal_to_proper {R : Type u} [comm_ring R] :  Π {I : ideal R} , ↑I ≠ @univ R → proper_ideal R :=
+def is_proper {R : Type u} [comm_ring R] : ideal R → Prop := λ I : ideal R, ↑I ≠ @univ R 
+
+def ideal_to_proper {R : Type u} [comm_ring R] :  Π {I : ideal R} , is_proper I → proper_ideal R :=
 begin
   intros I hI,
   split,

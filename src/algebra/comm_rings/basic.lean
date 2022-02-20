@@ -275,4 +275,11 @@ begin
   refl,
 end
 
+
+/-
+  showing that a bijective ring hom is an isomorphism.
+-/
+
+
+
 end comm_ring

@@ -1,7 +1,7 @@
 import algebra.comm_rings.basic
 import algebra.comm_rings.ideals.basic
 import algebra.comm_rings.ideals.instances
-
+import algebra.comm_rings.instances.basic
 
 namespace comm_ring
 
@@ -434,7 +434,7 @@ begin
   exact φ.prevs_one,
 end
   
-def quot_ring_can_hom {R : Type u} {Q : Type v} [comm_ring R] (I : ideal R) (lQ:comm_ring Q) (φ : R →ᵣ Q) (hφvan : ∀ r : R , r ∈ I.body → φ r = 0)
+def quot_ring_can_hom {R : Type u} {Q : Type v} [comm_ring R] (I : ideal R) [lQ:comm_ring Q] (φ : R →ᵣ Q) (hφvan : ∀ r : R , r ∈ I.body → φ r = 0)
   : ((R/ᵣI) →ᵣ Q) := 
   {
     map := quot_ring_can_map I lQ φ hφvan,
@@ -454,7 +454,8 @@ begin
   intros pair hpair,
   cases pair with Q rest,
   cases rest with lQ φ,
-  existsi (quot_ring_can_hom I lQ φ hpair),
+  resetI,
+  existsi (quot_ring_can_hom I φ hpair),
   split,
   apply ring_hom_equality,
   refl,
@@ -523,6 +524,19 @@ begin
   intros ψint hψint,
   apply ψup,
   exact and.left hψint,
+end
+
+theorem first_ring_isomorphism_thm {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] (φ : R₁ →ᵣ R₂)
+  : ∃ ψ : (R₁/ᵣ(ker φ)) →ᵣ Im φ, ring_isomorphism ψ :=
+begin
+  have ψ : (R₁/ᵣ(ker φ)) →ᵣ Im φ,
+    apply quot_ring_can_hom (ker φ) (im_trival_hom_in φ),
+    intros r hr,
+    apply val_injective,
+    apply zero_ideal_is_just_zero,
+    exact hr,
+  existsi ψ,
+  sorry,
 end
 
 end comm_ring
