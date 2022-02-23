@@ -262,6 +262,19 @@ begin
   refl,
 end
 
+lemma not_empty_image_not_empty {X : Type u} {Y : Type v} (f : X → Y) {s : set X} (ns : s ≠ ∅) 
+  : (image f s) ≠ ∅ :=
+begin
+  let x := some (not_empty_set_has_element ns),
+  have hx : x ∈ s := some_spec (not_empty_set_has_element ns),
+  have hfx : f x ∈ image f s,
+    existsi x,
+    exact ⟨hx,rfl⟩,
+  intro ab,
+  rw ab at hfx,
+  assumption,
+end
+
 theorem intersection_dis_over_union {X : Type u} (C : set (set X)) (A : set X) : (⋃₀ C) ∩ A = ⋃₀ (image (λ B, B ∩ A) C) :=
 begin
   apply subset_antisymmetric,

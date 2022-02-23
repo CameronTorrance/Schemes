@@ -86,3 +86,13 @@ begin
   rw not_or_and_not_eqv,
   rw not_not_eqv,
 end
+
+theorem contrapostive (p q : Prop) : (¬q → ¬p) → (p → q) := 
+begin
+  intros hnqnp hp,
+  cases (em q),
+  exact h,
+  apply false.elim,
+  apply hnqnp h,
+  exact hp, 
+end
