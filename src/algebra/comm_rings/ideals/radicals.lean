@@ -217,7 +217,15 @@ begin
 end
 
 private lemma maximal_no_pow_f_prime {hf : ¬(nilpotent f)} {J : subtype (no_pows_of_f hf)} 
-  : maximal_element J → is_prime (cvrt J) := sorry
+  : maximal_element J → is_prime (cvrt J) := 
+begin
+  intros hJ x y,
+  apply contrapostive,
+  rw not_or_and_not_eqv,
+  simp [cvrt_body_eq],
+  intro hxy,
+  cases hxy with hx hy,
+end
 
 lemma thm (hf : ¬(nilpotent f)) : ∃ p : Spec R, f ∉ p.body := 
 begin

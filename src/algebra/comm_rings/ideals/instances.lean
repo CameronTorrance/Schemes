@@ -298,6 +298,8 @@ def sum_of_ideals {R : Type u} [comm_ring R] (I₁ : ideal R) (I₂ : ideal R) :
 
 instance add_ideals {R : Type u} [comm_ring R] (I₁ : ideal R) (I₂ : ideal R) : has_add (ideal R) := ⟨λ I₁ I₂, sum_of_ideals I₁ I₂⟩ 
 
+def princple_ideal {R : Type u} [comm_ring R] (r : R) : ideal R := ideal_generated_by_set (λ x, x = r)
+
 theorem intersection_of_ideals_add_closure {R : Type u} [comm_ring R] (C : set (ideal R)) 
   : ∀ a b : R, (a ∈ ⋂₀ (image (λ I : ideal R, I.body) C)) → (b ∈ ⋂₀ (image (λ I : ideal R, I.body) C))
     → (a + b) ∈ ⋂₀ (image (λ I : ideal R, I.body) C) :=
