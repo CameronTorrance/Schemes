@@ -237,6 +237,8 @@ begin
   refl,
 end
 
+
+
 instance zero_ring_is_ring : comm_ring zero_ring :=
   {
     add := λ _ _, zero_ring.elm,
