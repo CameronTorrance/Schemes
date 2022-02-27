@@ -1,3 +1,5 @@
+import category_theory.basic
+
 universes u v w y
 
 class comm_ring (R: Type u) extends has_add R, has_mul R, has_one R, has_zero R, has_neg R :=
@@ -126,6 +128,22 @@ begin
   intro a,
   refl,
 end
+
+lemma power_of_succ {R : Type u} [comm_ring R] (a : R) : ∀ n : ℕ, a^n.succ = a^n * a :=
+begin
+  intro n,
+  rw mul_comm,
+  refl,
+end
+
+lemma power_of_add {R : Type u} [comm_ring R] (a : R) : ∀ n m : ℕ, a^(n + m) = (a^n) * (a^m) :=
+begin
+  intros n m,
+  induction m with m hm,
+  rw [nat.add_zero n,power_of_zero,mul_one],
+  rw [nat.add_succ,power_of_succ,power_of_succ,hm],
+  rw mul_assoc,
+end 
 
 def nat_to_ring (R :Type u) [comm_ring R] : ℕ → R 
   | 0            := 0
@@ -279,7 +297,6 @@ end
 /-
   showing that a bijective ring hom is an isomorphism.
 -/
-
 
 
 end comm_ring

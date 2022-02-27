@@ -296,9 +296,35 @@ def sum_of_ideals {R : Type u} [comm_ring R] (I₁ : ideal R) (I₂ : ideal R) :
     mul_absorb := sum_of_ideals_mul_absorb I₁ I₂,
   }
 
-instance add_ideals {R : Type u} [comm_ring R] (I₁ : ideal R) (I₂ : ideal R) : has_add (ideal R) := ⟨λ I₁ I₂, sum_of_ideals I₁ I₂⟩ 
+instance add_ideals {R : Type u} [comm_ring R]  : has_add (ideal R) := ⟨λ I₁ I₂, sum_of_ideals I₁ I₂⟩ 
 
 def princple_ideal {R : Type u} [comm_ring R] (r : R) : ideal R := ideal_generated_by_set (λ x, x = r)
+
+lemma elements_of_princple_ideal {R : Type u} [comm_ring R] {x : R} {r : R} : r ∈ (princple_ideal x).body → ∃ a : R, r = a * x :=
+begin
+  intro h,
+  induction h with r a₁ s l trv hs trv hr hl,
+  existsi (0:R),
+  rw [mul_comm, mul_zero],
+  let a₂ := some hl,
+  have ha₂ : l = a₂ * x := some_spec hl,
+  existsi (a₁ + a₂),
+  have hsx : s = x := hs,
+  rw [mul_comm,mul_dis,mul_comm,hr,ha₂,hsx],
+  simp [mul_comm],
+end
+
+lemma princple_ideal_membership {R : Type u} [comm_ring R] {x : R} {r : R} : (∃ a : R, r = a * x) → r ∈ (princple_ideal x).body :=
+begin
+  intro h,
+  cases h with a ha,
+  rw ha,
+  apply linear_combination.add_term,
+  trivial,
+  exact rfl,
+  apply linear_combination.empty_sum,
+  rw add_zero,
+end
 
 theorem intersection_of_ideals_add_closure {R : Type u} [comm_ring R] (C : set (ideal R)) 
   : ∀ a b : R, (a ∈ ⋂₀ (image (λ I : ideal R, I.body) C)) → (b ∈ ⋂₀ (image (λ I : ideal R, I.body) C))

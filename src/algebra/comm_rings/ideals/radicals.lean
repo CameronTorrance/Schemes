@@ -1,7 +1,9 @@
 import misc.zorns_lemma
 import misc.prop
+import misc.set
 import algebra.comm_rings.basic
 import algebra.comm_rings.ideals.basic
+import algebra.comm_rings.ideals.identities
 import algebra.comm_rings.ideals.instances
 import algebra.comm_rings.ideals.order
 import algebra.comm_rings.instances.quotient_ring
@@ -13,6 +15,8 @@ universe u
 open set
 
 def nilpotent {R : Type u} [comm_ring R] (r : R) : Prop := ∃ n : ℕ, r^(nat.succ n) = 0
+
+def nilradical_set (R : Type u) [comm_ring R] : set R := λ n, nilpotent n
 
 lemma prime_ideal_power_mem (R : Type u) [comm_ring R] (p : Spec R) : 
   ∀ {r : R} {n : ℕ}, r^n.succ ∈ p.body → r ∈ p.body :=
@@ -216,6 +220,33 @@ begin
   assumption,
 end
 
+private lemma pow_f_in_extension {hf : ¬(nilpotent f)} {J : subtype (no_pows_of_f hf)} 
+  : maximal_element J → ∀ {x} , x ∉ J.val.body → ∃ n : ℕ, f^n.succ ∈ (J.val + (princple_ideal x)).body :=
+begin
+  intros mJ x hx,
+  by_contradiction ab_raw,
+  have ab := forall_not_of_not_exists ab_raw,
+  simp at ab,
+  let J_ex : subtype (no_pows_of_f hf) := {val := J.val + princple_ideal x, property := ab },
+  have trv : J_ex.val = J.val + princple_ideal x := rfl,
+  have nJ_ex : J_ex ≠ J,
+    intro ab,
+    apply ideal_extension_proper hx,
+    rw ← trv,
+    rw ab,
+  apply nJ_ex,
+  apply mJ,
+  intros y hy,
+  rw trv,
+  existsi y,
+  existsi (0:R),
+  split,
+  exact hy,
+  split,
+  apply ideal.contains_zero,
+  rw add_zero,
+end 
+
 private lemma maximal_no_pow_f_prime {hf : ¬(nilpotent f)} {J : subtype (no_pows_of_f hf)} 
   : maximal_element J → is_prime (cvrt J) := 
 begin
@@ -225,6 +256,20 @@ begin
   simp [cvrt_body_eq],
   intro hxy,
   cases hxy with hx hy,
+  cases pow_f_in_extension hJ hx with n hn,
+  cases pow_f_in_extension hJ hy with m hm,
+  have main : f^(n.succ + m.succ) ∈ (J.val + princple_ideal (x*y)).body,
+    apply product_of_ideal_extension,
+    rw power_of_add,
+    apply product_in_product_of_ideals,
+    exact hn,
+    exact hm,
+  apply proper_ext_ideal_not_mem,
+  intro hrw,
+  rw hrw at main,
+  rw nat.add_succ n.succ m at main,
+  apply J.property,
+  exact main,
 end
 
 lemma thm (hf : ¬(nilpotent f)) : ∃ p : Spec R, f ∉ p.body := 
@@ -250,5 +295,53 @@ begin
 end
 
 end not_nilpotent_not_in_some_prime_ideal
+
+theorem nilradical_intersection_of_prime_ideals (R : Type u) [comm_ring R] : ↑(nilradical R) = nilradical_set R :=
+begin
+  apply set.subset_antisymmetric,
+  split,
+  intro x,
+  apply contrapostive,
+  intro hx,
+  cases not_nilpotent_not_in_some_prime_ideal.thm hx with p hp,
+  intro ab,
+  apply hp,
+  apply ab,
+  existsi ↑p,
+  split,
+  apply image_membership,
+  trivial,
+  refl,
+  intros x hx,
+  intros A hA,
+  cases hA with I hI,
+  cases hI with hI hrw₁,
+  cases hI with p hp,
+  cases hp with trv hrw₂,
+  simp at hrw₁,
+  simp at hrw₂,
+  rw [← hrw₁,← hrw₂],
+  apply nilpotents_in_all_prime_ideals,
+  exact hx,
+end
+
+def radical {R : Type u} [comm_ring R] (I:ideal R) : ideal R 
+  := preimage_of_ideal (quot_ring_hom I) (nilradical (R/ᵣI))
+
+prefix `√` : 40 := radical
+
+lemma elements_of_nilradical {R : Type u} [comm_ring R] (I:ideal R) 
+  : ∀ x : R, x ∈ (√I).body ↔ ∃ n : ℕ, x^n.succ ∈ I.body :=
+begin
+  intro x,
+  split,
+  intro hx,
+  have trv₁ : quot_ring_hom I x ∈ ↑(nilradical (R/ᵣI)) := hx,
+  rw nilradical_intersection_of_prime_ideals (R/ᵣI) at trv₁,
+  cases trv₁ with n hn,
+  existsi n,
+  
+
+end 
 
 end comm_ring
