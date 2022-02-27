@@ -47,7 +47,7 @@ begin
               ... = g₂ y          : by rw hg₁,
 end
 
-theorem bijection_has_inverse {X: Type u} {Y : Type v} [inhabited X]{f : X → Y}
+theorem bijection_has_inverse {X: Type u} {Y : Type v} [inhabited X] {f : X → Y}
   : bijective f → ∃ g : Y → X, inverse g f :=
 begin
   intro hf,
@@ -65,6 +65,19 @@ begin
   rw hrw,
   apply funext,
   apply hg₂,
+end
+
+theorem inverse.injective {X: Type u} {Y : Type v} {f : X → Y} {g : Y → X} 
+  : inverse g f → injective f :=
+begin
+  intro h,
+  cases h with h₁ h₂,
+  apply left_inverse.injective,
+  have gli : left_inverse g f,
+    intro y,
+    rw [← comp_app g f, h₂],
+    refl,
+  exact gli, 
 end
 
 end function

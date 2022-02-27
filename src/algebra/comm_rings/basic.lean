@@ -1,4 +1,5 @@
 import category_theory.basic
+import misc.function
 
 universes u v w y
 
@@ -15,7 +16,9 @@ class comm_ring (R: Type u) extends has_add R, has_mul R, has_one R, has_zero R,
 namespace comm_ring
 
 open list
+open function
 
+instance comm_ring_inhabited (R : Type u) [comm_ring R] : inhabited R := ⟨(0:R)⟩
 
 /-
   Trival algebraic identities. 
@@ -228,7 +231,9 @@ def ring_hom_comp {R₁ : Type u} {R₂ : Type v} {R₃ : Type w}[comm_ring R₁
     prevs_mul := compose_prevs_mul φ₁ φ₂,
   }
 
-infixr `∘ᵣ` : 25 := ring_hom_comp
+infixr ` ∘ᵣ ` : 25 := ring_hom_comp
+
+
 
 theorem ring_hom_preserves_zero {R₁ : Type u} {R₂ : Type v} [l₁ :comm_ring R₁] [l₂:comm_ring R₂] (φ : R₁ →ᵣ R₂) : φ 0 = 0 :=
 begin
@@ -298,5 +303,76 @@ end
   showing that a bijective ring hom is an isomorphism.
 -/
 
+
+theorem inverse_prevs_one {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] {φ : R₁ →ᵣ R₂} {g : R₂ → R₁} 
+  : inverse g ⇑φ → g 1 = 1 := 
+begin
+  intro h,
+  cases h with h₁ h₂,
+  rw ←φ.prevs_one,
+  have trv : φ.map = ⇑φ := rfl,
+  rw [trv,← comp_app g (⇑φ), h₂],
+  refl,
+end
+
+theorem inverse_prevs_mul {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] {φ : R₁ →ᵣ R₂} {g : R₂ → R₁} 
+  : inverse g ⇑φ → ∀ a b : R₂, g (a * b) = (g a) * (g b) := 
+begin
+  intro h,
+  have φinj : injective ⇑φ := inverse.injective h,
+  cases h with h₁ h₂,
+  intros a b,
+  apply φinj,
+  have trv : φ.map = ⇑φ := rfl,
+  rw ← trv,
+  rw φ.prevs_mul,
+  rw trv,
+  rw ← comp_app (⇑φ) g,
+  rw ← comp_app (⇑φ) g,
+  rw ← comp_app (⇑φ) g,
+  simp [h₁],
+end
+
+theorem inverse_prevs_add {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] {φ : R₁ →ᵣ R₂} {g : R₂ → R₁} 
+  : inverse g ⇑φ → ∀ a b : R₂, g (a + b) = (g a) + (g b) := 
+begin
+  intro h,
+  have φinj : injective ⇑φ := inverse.injective h,
+  cases h with h₁ h₂,
+  intros a b,
+  apply φinj,
+  have trv : φ.map = ⇑φ := rfl,
+  rw ← trv,
+  rw φ.prevs_add,
+  rw trv,
+  rw ← comp_app (⇑φ) g,
+  rw ← comp_app (⇑φ) g,
+  rw ← comp_app (⇑φ) g,
+  simp [h₁],
+end
+
+theorem bijective_ring_hom_ring_iso {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] {φ : R₁ →ᵣ R₂}
+  : bijective ⇑φ → ring_isomorphism φ :=
+begin
+  intro hφb,
+  cases bijection_has_inverse hφb with g hg,
+  let ghom : R₂ →ᵣ R₁,
+    split,
+    exact inverse_prevs_one hg,
+    exact inverse_prevs_mul hg,
+    exact inverse_prevs_add hg,
+  have trv₁ : ⇑ghom = g := rfl,
+  cases hg with hg₁ hg₂,
+  existsi ghom,
+  split,
+  apply ring_hom_equality_hack,
+  have trv₂ : ⇑(ghom ∘ᵣ φ) = ⇑ghom ∘ ⇑φ := rfl,
+  rw [trv₂,trv₁,hg₂],
+  refl,
+  apply ring_hom_equality_hack,
+  have trv₂ : ⇑(φ ∘ᵣ ghom) = φ ∘ ⇑ghom := rfl,
+  rw [trv₂,trv₁,hg₁],
+  refl,
+end
 
 end comm_ring
