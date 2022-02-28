@@ -1,8 +1,11 @@
 import algebra.comm_rings.ideals.basic
 import algebra.comm_rings.ideals.instances
 import misc.set
+import misc.function
 
-universes u 
+universes u v
+
+open function
 
 namespace comm_ring
 
@@ -126,5 +129,64 @@ begin
   apply ideal.contains_zero,
   rw add_zero,
 end
+
+
+theorem elements_of_preimage {R₁ : Type u} [l:comm_ring R₁] {R₂ : Type v} [comm_ring R₂] (φ : R₁ →ᵣ R₂) (I : ideal R₂)
+  : ∀ {x : R₁}, x ∈ (preimage_of_ideal φ I).body ↔ φ x ∈ I.body :=
+begin
+  intro x,
+  split,
+  intro h,
+  exact h,
+  intro h,
+  exact h,
+end
+
+theorem elements_of_kernel {R₁ : Type u} [l:comm_ring R₁] {R₂ : Type v} [comm_ring R₂] (φ : R₁ →ᵣ R₂) 
+  : ∀ {x : R₁}, x ∈ (ker φ).body ↔ φ x = 0  := 
+begin
+  intro x,
+  have trv : ker φ = preimage_of_ideal φ (zero_ideal R₂) := rfl,
+  rw trv,
+  rw elements_of_preimage,
+  split,
+  apply zero_ideal_is_just_zero,
+  intro hrw,
+  rw hrw,
+  apply linear_combination.empty_sum,
+end
+
+
+theorem zero_kernel_injective {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] {φ : R₁ →ᵣ R₂}
+  : ker φ = zero_ideal R₁ → injective ⇑φ :=
+begin
+  intro h,
+  intros x y hxy,
+  have hxyinkφ : (x + -y) ∈ (ker φ).body,
+    have sub₁ : φ (x + -y) = 0,
+      have trv : φ.map = ⇑φ := rfl,
+      rw ← trv, 
+      rw φ.prevs_add,
+      rw trv,
+      rw minus_commutes_with_hom,
+      rw hxy,
+      rw minus_inverse,
+    have sub₂ : φ (x + -y) ∈ (zero_ideal R₂).body,
+      rw sub₁,
+      apply linear_combination.empty_sum,
+    exact sub₂,
+    apply zero_diff_equal,
+    apply zero_ideal_is_just_zero,
+    rw ← h,
+    assumption,
+end
+
+theorem zero_ideal_in_all_ideals {R : Type u} [comm_ring R] : ∀ I : ideal R, (zero_ideal R).body ⊆ I :=
+begin
+  intros I x hx,
+  have hrw := zero_ideal_is_just_zero hx,
+  rw hrw,
+  apply ideal.contains_zero,
+end  
 
 end comm_ring

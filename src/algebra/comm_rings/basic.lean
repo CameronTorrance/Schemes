@@ -111,7 +111,18 @@ begin
   apply minus_unquie,
   rw add_comm,
   rw minus_inverse,
-end 
+end
+
+theorem zero_diff_equal {R : Type u} [comm_ring R] : ∀ {x y : R}, x + (-y) = 0 → x = y :=
+begin
+  intros x y h,
+  exact calc x = x + 0        : by rw add_zero
+           ... = x + (y + -y) : by rw minus_inverse
+           ... = x + (-y + y) : by rw add_comm y (-y) 
+           ... = (x + -y) + y : by rw add_assoc
+           ... = 0 + y        : by rw ←h 
+           ... = y            : by simp [add_comm,add_zero],
+end
 
 def pow {R : Type u} [comm_ring R] : R → ℕ → R 
   | r nat.zero     := 1
@@ -254,6 +265,22 @@ begin
   rw [←trv, ← φ.prevs_add, minus_inverse,trv,ring_hom_preserves_zero],
 end
 
+theorem ring_hom_prevs_pow {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] (φ : R₁ →ᵣ R₂) (n :ℕ)
+  : ∀ x : R₁, φ (x^n) = (φ x)^n :=
+begin
+  intro x,
+  induction n with n hn,
+  simp [power_of_zero],
+  exact φ.prevs_one,
+  rw power_of_succ,
+  have trv: ⇑φ = φ.map := rfl,
+  simp [trv],
+  rw φ.prevs_mul,
+  simp [←trv],
+  rw hn,
+  rw ← power_of_succ,
+end
+
 theorem ring_hom_equality_hack {R₁ : Type u} [comm_ring R₁] {R₂ : Type v} [comm_ring R₂] {φ₁ φ₂: R₁ →ᵣ R₂} 
 : (⇑φ₁) = (φ₂.map) → φ₁ = φ₂ :=
 begin
@@ -374,5 +401,7 @@ begin
   rw [trv₂,trv₁,hg₁],
   refl,
 end
+
+
 
 end comm_ring

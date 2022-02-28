@@ -36,18 +36,18 @@ instance mcs_has_mul {R: Type u} [comm_ring R] {S: mul_closed_set R} : has_mul S
 @[simp]
 lemma mcs_mul_coe {R: Type u} [comm_ring R] {S: mul_closed_set R} : ∀ s₁ s₂ : S, ↑(s₁ * s₂) = (↑s₁) * (↑s₂ :R) := λ _ _,rfl
 
-def equal_as_fractions {R: Type u} [comm_ring R] {S: mul_closed_set R} : R × S → R × S → Prop :=
+def equal_as_fractions {R: Type u} [comm_ring R] (S: mul_closed_set R) : R × S → R × S → Prop :=
   λ  p₁ p₂,  ∃ (s : S), ↑s * (p₁.1 * p₂.2 + -(p₂.1 * p₁.2)) = 0
 
-lemma equal_as_fractions_refl {R: Type u} [comm_ring R] {S: mul_closed_set R} : ∀ f : R × S, equal_as_fractions f f :=
+lemma equal_as_fractions_refl {R: Type u} [comm_ring R] (S: mul_closed_set R) : ∀ f : R × S, equal_as_fractions S f f :=
 begin
   intro f,
   existsi (⟨(1:R),S.contains_one⟩ : S),
   rw [minus_inverse,mul_zero],
 end
 
-lemma equal_as_fractions_symm {R: Type u} [comm_ring R] {S : mul_closed_set R} 
-  : ∀ f g : R × S, equal_as_fractions f g → equal_as_fractions g f :=
+lemma equal_as_fractions_symm {R: Type u} [comm_ring R] (S : mul_closed_set R) 
+  : ∀ f g : R × S, equal_as_fractions S f g → equal_as_fractions S g f :=
 begin
   intros f g hfg,
   cases hfg with s hs,
@@ -56,8 +56,8 @@ begin
   rw [mul_comm,← minus_mul,mul_comm,hs,minus_zero_zero],
 end
 
-lemma equal_as_fractions_trans {R: Type u} [comm_ring R] {S : mul_closed_set R}
-  : ∀ f₁ f₂ f₃ : R × S, equal_as_fractions f₁ f₂ → equal_as_fractions f₂ f₃ → equal_as_fractions f₁ f₃ :=
+lemma equal_as_fractions_trans {R: Type u} [comm_ring R] (S : mul_closed_set R)
+  : ∀ f₁ f₂ f₃ : R × S, equal_as_fractions S f₁ f₂ → equal_as_fractions S f₂ f₃ → equal_as_fractions S f₁ f₃ :=
 begin
   intros f₁ f₂ f₃ hf₁f₂ hf₂f₃,
   cases f₁ with r₁ s₁,
@@ -140,6 +140,14 @@ begin
   rw [hz₁,hz₂,add_zero],
 end
 
+instance fraction_setoid (R : Type u) [comm_ring R] (S : mul_closed_set R) : setoid (R × S)
+  := ⟨equal_as_fractions S, equal_as_fractions_refl S, equal_as_fractions_symm S, equal_as_fractions_trans S⟩ 
 
+def localisation (R : Type u) [comm_ring R] (S : mul_closed_set R) := quotient (comm_ring.fraction_setoid R S)
+
+notation R `[`S `⁻¹]` := localisation R S 
+
+def localisation_pre_add {R : Type u} [comm_ring R] (S : mul_closed_set R) : R × S → R × S → R[S⁻¹] 
+  | (x₁,s₁) (x₂,s₂) := ⟦(x₁ * s₂ + x₂ * s₁, s₁ * s₂)⟧
 
 end comm_ring

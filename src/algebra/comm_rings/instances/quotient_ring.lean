@@ -1,6 +1,7 @@
 import algebra.comm_rings.basic
 import algebra.comm_rings.ideals.basic
 import algebra.comm_rings.ideals.instances
+import algebra.comm_rings.ideals.identities
 import algebra.comm_rings.instances.basic
 
 namespace comm_ring
@@ -328,6 +329,13 @@ def quot_ring_hom {R: Type u} [comm_ring R] (I : ideal R) : R →ᵣ (R/ᵣI) :=
     prevs_one := rfl, 
   }
 
+theorem quotient_ring_concrete_char_of_quot_map {R: Type u} [comm_ring R] (I : ideal R)
+  : ∀ x : R, quot_ring_hom I x = (x +ᵣ I) :=
+begin
+  intro,
+  refl,
+end
+
 theorem quotient_zero_implies_in_ideal {R: Type u} [comm_ring R] (I : ideal R) 
   : ∀ {x : R} , (x +ᵣ I) = 0 → x ∈ I.body := 
 begin
@@ -443,6 +451,8 @@ def quot_ring_can_hom {R : Type u} {Q : Type v} [comm_ring R] (I : ideal R) [lQ:
     prevs_one := quot_ring_can_map_prevs_one I lQ φ hφvan,
   }
 
+
+
 theorem quotient_ring_satisfies_its_universal_property {R : Type u} [comm_ring R] (I :ideal R) 
   : quot_ring_universal_property I ⟨(R/ᵣI),comm_ring.quotient_ring_comm_ring I,quot_ring_hom I⟩ :=
 begin
@@ -529,14 +539,61 @@ end
 theorem first_ring_isomorphism_thm {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] (φ : R₁ →ᵣ R₂)
   : ∃ ψ : (R₁/ᵣ(ker φ)) →ᵣ Im φ, ring_isomorphism ψ :=
 begin
-  have ψ : (R₁/ᵣ(ker φ)) →ᵣ Im φ,
-    apply quot_ring_can_hom (ker φ) (im_trival_hom_in φ),
+  have hφvanish : ∀ r : R₁, r ∈ (ker φ).body → im_trival_hom_in φ r = 0,
     intros r hr,
     apply val_injective,
     apply zero_ideal_is_just_zero,
-    exact hr,
+    exact hr,  
+  let ψ : (R₁/ᵣ(ker φ)) →ᵣ Im φ := quot_ring_can_hom (ker φ) (im_trival_hom_in φ) hφvanish,
+  have trv : ∀ r : R₁, (ψ (r+ᵣ ((ker φ) : ideal R₁))).val = φ r,
+    intro r,
+    have subtrv₁ : ψ = quot_ring_can_hom (ker φ) (im_trival_hom_in φ) hφvanish := rfl,
+    rw subtrv₁,
+    simp,
+    have subtrv₂ : quot_ring_can_hom (ker φ) (im_trival_hom_in φ) hφvanish (r +ᵣ ((ker φ) : ideal R₁)) 
+                    = im_trival_hom_in φ r,
+      simp,
+      apply quotient_ring_concrete_char_of_can_map (ker φ),
+      exact hφvanish,
+    rw subtrv₂,
+    refl,
   existsi ψ,
-  sorry,
+  apply bijective_ring_hom_ring_iso,
+  split,
+  apply zero_kernel_injective,
+  apply ideal_equality,
+  apply subset_antisymmetric,
+  split,
+  intros q hq,
+  let r : R₁ := some (quotient_ring_exists_rep (ker φ) q),
+  have hr : (r +ᵣ ((ker φ):ideal R₁) ) = q:= some_spec (quotient_ring_exists_rep (ker φ) q),
+  simp at hr,
+  rw ← hr,
+  rw ← hr at hq,
+  rw elements_of_kernel at hq,
+  have hrkφ : φ r = 0,
+    rw ← trv,
+    simp,
+    rw hq,
+    refl,
+  have hq0 : (r +ᵣ ((ker φ) :ideal R₁)) = 0,
+    apply in_ideal_implies_quotient_zero,
+    rw elements_of_kernel,
+    assumption,
+  simp at hq0,
+  rw hq0,
+  apply linear_combination.empty_sum,
+  intros q hq,
+  rw elements_of_kernel,
+  rw zero_ideal_is_just_zero hq,
+  apply ring_hom_preserves_zero ψ,
+  intro y,
+  cases y.property with x hx,
+  existsi (x +ᵣ ((ker φ) : ideal R₁)),
+  apply val_injective,
+  rw trv,
+  symmetry,
+  assumption,
 end
 
 end comm_ring
