@@ -109,4 +109,7 @@ begin
   exact subspace_pairwise_inters_open S,
 end
 
+
+
+
 end topology

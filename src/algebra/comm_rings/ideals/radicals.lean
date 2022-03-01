@@ -330,7 +330,7 @@ def radical {R : Type u} [comm_ring R] (I:ideal R) : ideal R
 
 prefix `√` : 40 := radical
 
-lemma elements_of_nilradical {R : Type u} [comm_ring R] (I:ideal R) 
+lemma elements_of_radical {R : Type u} [comm_ring R] (I:ideal R) 
   : ∀ x : R, x ∈ (√I).body ↔ ∃ n : ℕ, x^n.succ ∈ I.body :=
 begin
   intro x,
@@ -340,8 +340,21 @@ begin
   rw nilradical_intersection_of_prime_ideals (R/ᵣI) at trv₁,
   cases trv₁ with n hn,
   existsi n,
-  
-
+  apply quotient_zero_implies_in_ideal,
+  simp,
+  rw ← ring_hom_prevs_pow at hn,
+  exact hn,
+  intro h,
+  cases h with n hn,
+  have hint : quot_ring_hom I x ∈ ↑(nilradical (R/ᵣI)),
+    rw nilradical_intersection_of_prime_ideals,
+    have hint₁ : nilpotent (quot_ring_hom I x),
+      existsi n,
+      rw ← ring_hom_prevs_pow,
+      apply in_ideal_implies_quotient_zero,
+      exact hn,
+    exact hint₁,
+  exact hint,
 end 
 
 end comm_ring

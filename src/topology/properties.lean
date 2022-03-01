@@ -23,4 +23,19 @@ def compact_set {X : Type u} [topology X] (S : set X) : Prop := compact_space (s
 def hausdorff (X : Type u) [topology X] : Prop
   := ∀ x y : X, x ≠ y → ∃ U_x U_y : set X, (is_open U_x) ∧ (is_open U_y) ∧ (x ∈ U_x) ∧ (y ∈ U_y) ∧ (U_x ∩ U_y = ∅)
 
+structure closed_topology (X : Type u) :=
+  (closed_b : set X → Prop)
+  (whole_space_closed : closed_b univ)
+  (empty_set_closed : closed_b ∅)
+  (arbitary_inters_closed (s: set (set X)) : (∀ t : set X, t ∈ s → closed_b t) → closed_b (⋂₀ s))
+  (pairwise_unions_open : ∀ s t : set X, closed_b s → closed_b t → closed_b (s ∪ t))
+
+structure base (X : Type u) :=
+  (elm: set X → Prop)
+  (cover : is_cover elm)
+  (inters_covered : ∀ B₁ B₂ : set X, elm B₁ → elm B₂ → 
+    ∀ x, x ∈ B₁ ∩ B₂ → ∃ B₃, elm B₃ ∧ x ∈ B₃ ∧ B₃ ⊆ B₁ ∩ B₂)
+
+
+
 end topology
