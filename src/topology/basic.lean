@@ -50,7 +50,11 @@ begin
 end
 
 def open_set_intersection {X : Type u} [topology X] : Open X → Open X → Open X 
-  | ⟨U₁, hU₁⟩ ⟨U₂,hU₂⟩ := ⟨U₁ ∩ U₂, topology.pairwise_inters_open U₁ U₂ hU₁ hU₂⟩ 
+  | O₁ O₂ := ⟨O₁.val ∩ O₂.val, topology.pairwise_inters_open O₁.val O₂.val O₁.val_open O₂.val_open⟩ 
+
+instance open_set_has_inter {X : Type u} [topology X] : has_inter (Open X) := ⟨topology.open_set_intersection⟩
+
+lemma open_set_inter_val {X : Type u} [topology X] (O₁ O₂ : Open X) : (O₁ ∩ O₂).val = O₁.val ∩ O₂.val := rfl
 
 instance category_of_open_sets (X : Type u) [topology X] : category (Open X) :=
 {
@@ -84,8 +88,21 @@ begin
   apply inclusion.proof,
   apply hC.1,
   exact hO,
-end 
+end
 
+def inter_inc_left {X : Type u} [topology X] (O₁ O₂ : Open X) : inclusion (O₁ ∩ O₂) O₁ := 
+begin
+  apply inclusion.proof,
+  rw open_set_inter_val,
+  apply intersection_in_set,
+end
 
+def inter_inc_right {X : Type u} [topology X] (O₁ O₂ : Open X) : inclusion (O₁ ∩ O₂) O₂ := 
+begin
+  apply inclusion.proof,
+  rw open_set_inter_val,
+  rw intersection_commuative,
+  apply intersection_in_set,
+end
 
 end topology
