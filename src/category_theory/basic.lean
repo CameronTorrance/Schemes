@@ -38,6 +38,19 @@ begin
   exact idₘ B,
 end
 
+theorem functor_equality {C : Type u₁} {D : Type u₂} [category.{v₁} C] [category.{v₂} D] (F₁ F₂ : C +→ D) 
+  : F₁.map = F₂.map → F₁.fmap == F₂.fmap → F₁ = F₂ :=
+begin
+  cases F₁,
+  cases F₂,
+  intros h₁ h₂,
+  simp,
+  split,
+  exact h₁,
+  exact h₂,
+end
+
+
 def functor_comp {C₁ : Type u₁} {C₂ : Type u₂} {C₃ : Type u₃} [category.{v₁} C₁] [category.{v₂} C₂] [category.{v₃} C₃]
   (F₁ : C₂ +→ C₃) (F₂ : C₁ +→ C₂) : C₁ +→ C₃ := 
 {
