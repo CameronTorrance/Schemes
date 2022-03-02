@@ -1,6 +1,6 @@
 import topology.basic
 import category_theory.basic
-import category_theory.universal_properties.limit
+import category_theory.universal_properties.limit_colimit
 import category_theory.instances
 
 universes v u uₜ
