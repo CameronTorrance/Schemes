@@ -1,7 +1,7 @@
 import topology.basic
 import category_theory.basic
-import category_theory.universal_properties.limit_colimit
 import category_theory.instances
+import category_theory.universal_properties.limit_colimt
 
 universes v u uₜ
 
