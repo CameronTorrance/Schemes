@@ -3,7 +3,7 @@ import category_theory.basic
 import category_theory.instances
 import category_theory.universal_properties.limit_colimt
 
-universes v u uₜ
+universes v u 
 
 open category
 open topology
@@ -36,7 +36,7 @@ def glueable_sections {X : Type v} [topology X] {C : Type u} [category.{v} C] {S
      (∀ {s₁ s₂ : Σ O' : Open X, (S.val ⊚ 𝓕).map (op O')}, res 𝓕 (inter_inc_left s₁.1 s₂.1) s₁.2 = res 𝓕 (inter_inc_right s₁.1 s₂.1) s₂.2)
 
 
-structure sheaf (X : Type v) [topology X] {C : Type u} [category.{v} C] (S : concrete_category C)  :=
+structure sheaf (X : Type v) [topology X] {C : Type u} [category.{v} C] (S : concrete_category.{v} C)  :=
   (body : opposite (Open X) +→ C)
   (local_equality : ∀ O : Open X, ∀ {Co} (hCo : open_cover_of Co O),  
                     ∀ f g : (S.val ⊚ body).map (op O), 
@@ -51,12 +51,42 @@ structure sheaf (X : Type v) [topology X] {C : Type u} [category.{v} C] (S : con
 
 namespace sheaf
 
-theorem open_sets_at_a_point_filtered_category {X : Type u} [topology X] (p : X) : filtered_category (opposite {O : Open X // p ∈ O}) :=
+theorem op_open_sets_at_a_point_filtered_category {X : Type v} [topology X] (p : X) : filtered_category (opposite ({O : Open X // p ∈ O})) :=
 begin
   split,
   intros i₁ i₂,
-  have ui₁i₂ : {O : Open X // p ∈ O},
+  cases i₁ with O₁,
+  cases i₂ with O₂,
+  have hp : p ∈ (O₁ ∩ O₂ : Open X),
+    exact ⟨O₁.property, O₂.property⟩,
+  existsi op (subtype.mk (O₁ ∩ O₂ : Open X) hp),
+  split,
+  split,
+  apply inc_to_mor,
+  simp,
+  apply inter_inc_left,
+  split,
+  apply inc_to_mor,
+  simp,
+  apply inter_inc_right,
+  intros i j f₁ f₂,
+  existsi j,
+  existsi idₘ j,
+  apply inclusion_equality,
 end
+
+def stalk_functor {X : Type v} [topology X] {C : Type u} [category.{v} C] {S : concrete_category.{v} C} 
+  (𝓕 : sheaf X S) (p : X) : opposite ({O: Open X // p ∈ O}) +→ C := 𝓕.body ⊚ (op_functor (open_at_point_forget p))
+
+noncomputable def stalk {X : Type v} [topology X] {C : Type u} [category.{v} C] {S : concrete_category.{v} C} 
+  (𝓕 : sheaf X S) (p : X) 
+  : Σ st : C, (Π oOp : opposite ({O: Open X // p ∈ O}), Mor ((stalk_functor 𝓕 p).map oOp) st) 
+  := filtered_colimit (op_open_sets_at_a_point_filtered_category p) S (stalk_functor 𝓕 p)
+
+theorem stalk_property {X : Type v} [topology X] {C : Type u} [category.{v} C] {S : concrete_category.{v} C} 
+  (𝓕 : sheaf X S) (p : X) 
+  : is_colimit (stalk_functor 𝓕 p) (stalk 𝓕 p)
+  := filtered_colimit_property (op_open_sets_at_a_point_filtered_category p) S (stalk_functor 𝓕 p)
 
 
 end sheaf

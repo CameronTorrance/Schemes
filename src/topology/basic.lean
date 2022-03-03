@@ -20,7 +20,7 @@ def is_open {X : Type u} [T_X: topology X] : set X → Prop := T_X.is_open
 def is_continous_map {X : Type u} {Y : Type v}[T_X : topology X][T_Y : topology Y] (f : X → Y) : Prop :=
 ∀ s : set Y , is_open s → is_open (pre_image f s)
 
-structure Open (X : Type u) [topology X] :=
+structure Open (X : Type u) [topology X] : Type u:=
   (val : set X)
   (val_open : is_open val)
 
@@ -30,7 +30,7 @@ def open_set_membership {X : Type u} [topology X] : X → Open X → Prop
 instance open_set_has_mem (X : Type u) [topology X] : has_mem X (Open X)
   := ⟨open_set_membership⟩ 
 
-inductive inclusion {X : Type u} [topology X] (O₁ O₂ : Open X) 
+inductive inclusion {X : Type u} [topology X] (O₁ O₂ : Open X) : Type u
   | proof : O₁.val ⊆ O₂.val → inclusion
 
 theorem inclusion_equality {X : Type u} [topology X] {O₁ O₂ : Open X} 
@@ -139,5 +139,13 @@ begin
   rw intersection_commuative,
   apply intersection_in_set,
 end
+
+def open_at_point_forget {X : Type u} [topology X] (p : X) : {O: Open X // p ∈ O} +→ Open X :=
+{
+  map := λ O, O.val,
+  fmap := λ O₁ O₂ f, f,
+  fmap_prevs_comp := λ _ _ _ _ _, rfl,
+  fmap_prevs_id := λ _, rfl,
+}
 
 end topology

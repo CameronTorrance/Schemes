@@ -123,6 +123,26 @@ instance opposite_categoy (C : Type u) [category.{v} C]: category.{v} (opposite 
     end,
 }
 
-
+def op_functor {C : Type u₁} {D : Type u₂} [SC:category.{v₁} C] [SD:category.{v₂} D] (F : C +→ D)
+  : (opposite C) +→ (opposite D) :=
+{
+  map := λ oC₁, op (F.map oC₁.val),
+  fmap := λ oC₁ oC₂ f, F.fmap f,
+  fmap_prevs_comp :=
+    begin
+      intros oC₁ oC₂ oC₃ f₁ f₂,
+      apply F.fmap_prevs_comp,
+    end, 
+  fmap_prevs_id :=
+    begin
+      intro oC,
+      cases oC with c,
+      have hrw : op c = {val := c} := rfl,
+      rw ← hrw,
+      simp [idₘ],
+      rw F.fmap_prevs_id,
+      refl,
+    end,
+}
 
 end category
