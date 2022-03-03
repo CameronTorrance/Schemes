@@ -4,6 +4,8 @@ universes v₁ v₂ v u₁ u₂ u
 
 namespace category
 
+open classical
+
 instance functor_category (C : Type u₁) (D : Type u₂) [category.{v₁} C] [category.{v₂} D]
   : category (C +→ D) := 
 {
@@ -89,6 +91,14 @@ begin
   assumption,
   intro h,
   rw h,
+end
+
+instance opposite_nonempty (C : Type u) [nC :nonempty C] : nonempty (opposite C) :=
+begin
+  split,
+  split,
+  apply choice,
+  assumption,
 end
 
 instance opposite_categoy (C : Type u) [category.{v} C]: category.{v} (opposite C) :=

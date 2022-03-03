@@ -24,6 +24,12 @@ structure Open (X : Type u) [topology X] :=
   (val : set X)
   (val_open : is_open val)
 
+def open_set_membership {X : Type u} [topology X] : X → Open X → Prop
+  := λ p O, p ∈ O.val
+
+instance open_set_has_mem (X : Type u) [topology X] : has_mem X (Open X)
+  := ⟨open_set_membership⟩ 
+
 inductive inclusion {X : Type u} [topology X] (O₁ O₂ : Open X) 
   | proof : O₁.val ⊆ O₂.val → inclusion
 
@@ -77,6 +83,35 @@ instance category_of_open_sets (X : Type u) [topology X] : category (Open X) :=
       apply inclusion_equality,
     end,
 }
+
+instance category_of_open_sets_at_point {X : Type u} (p : X) [topology X] : category ({O :Open X // p ∈ O}) :=
+{
+  Mor := λ O₁ O₂, inclusion O₁.val O₂.val,
+  idₘ := λ O, inclusion.proof (λ x hx, hx),
+  comp := λ O₁ O₂ O₃ i₁ i₂, inclusion_comp i₁ i₂,
+  comp_assoc :=
+    begin
+      intros O₁ O₂ O₃ O₄ i₁ i₂ i₃,
+      apply inclusion_equality,
+    end,
+  id_comp_left :=
+    begin
+      intros O₁ O₂ f,
+      apply inclusion_equality,
+    end,
+  id_comp_right :=
+    begin
+      intros O₁ O₂ f,
+      apply inclusion_equality,
+    end,
+}
+
+instance open_sets_at_a_point_nonempty {X : Type u} [topology X] (p : X) : nonempty ({O: Open X // p ∈ O}) :=
+begin
+  split,
+  existsi Open.mk univ topology.whole_space_open,
+  trivial,
+end 
 
 def open_cover_of {X : Type u} [topology X] (C : set (Open X)) (S : Open X)
   : Prop := (∀ {U : Open X} , U ∈ C → U.val ⊆ S.val) ∧ (∀ {x}, x ∈ S.val → ∃ U : Open X, U ∈ C ∧ x ∈ S.val)
