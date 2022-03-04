@@ -7,6 +7,7 @@ universes u v
 open inhabited
 open classical
 open subtype
+open list
 
 /-
   Useful set theortic operations not inculded in the standard libary that are needed to prove results about
@@ -343,6 +344,84 @@ begin
   exact trvB,
 end
 
+@[simp]
+theorem list_to_set_nil (X : Type u) : list_to_set nil = (∅ :set X) := rfl
+
+@[simp]
+theorem image_of_empty {A : Type u} {B : Type v} (f : A → B) : image f ∅ = ∅ := 
+begin
+  apply subset_antisymmetric,
+  split,
+  intros x hx,
+  cases hx with a ha,
+  cases ha,
+  apply false.elim,
+  exact ha_left,
+  apply empty_set_subset,
+end
+
+theorem image_dis_over_union {A : Type u} {B : Type v} (f : A → B) {A₁ A₂ : set A} : image f (A₁ ∪ A₂) = (image f A₁) ∪ (image f A₂) := 
+begin
+  apply subset_antisymmetric,
+  split,
+  intros b hb,
+  cases hb with a ha,
+  cases ha with ha hrw,
+  rw ← hrw,
+  cases ha,
+  left,
+  apply image_membership,
+  exact ha,
+  right,
+  apply image_membership,
+  exact ha,
+  intros b hb,
+  cases hb,
+  cases hb with a ha,
+  cases ha with ha hrw,
+  rw ← hrw,
+  apply image_membership,
+  left,
+  exact ha,
+  cases hb with a ha,
+  cases ha with ha hrw,
+  rw ← hrw,
+  apply image_membership,
+  right,
+  exact ha,
+end
+
+theorem image_of_singleton {A : Type u} {B : Type v} (f : A → B) (a : A) 
+  : image f (λ x, x = a) = (λ x, x = f a) :=
+begin
+  apply subset_antisymmetric,
+  split,
+  intros x hx,
+  cases hx with y hy,
+  cases hy with hy₁ hy₂,
+  have trv : y = a := hy₁,
+  rw trv at hy₂,
+  exact symm hy₂,
+  intros x hx,
+  have trv : x = f a := hx,
+  rw trv,
+  apply image_membership,
+  split,
+end 
+
+@[simp]
+theorem list_to_set_cons {A : Type u} (a : A) (l : list A) : list_to_set (a :: l) = (λ x, x = a) ∪ (list_to_set l) := rfl
+
+theorem image_of_list_to_set {A : Type u} {B : Type v} (f : A → B) (l: list A) 
+  : image f (list_to_set l) = list_to_set (map f l) :=
+begin
+  induction l with a l hl,
+  simp,
+  simp [map],
+  rw [image_dis_over_union,hl],
+  rw image_of_singleton,
+end
+
 theorem sunion_to_union {X : Type u} {A B : set X} : ⋃₀ (list_to_set [A,B]) = A ∪ B :=
 begin
   apply subset_antisymmetric,
@@ -456,7 +535,19 @@ begin
   exact ⟨ha,h⟩,
   rw h1 at ab,
   exact ab 
-end 
+end
+
+theorem diff_of_univ_empty {X : Type u} (A : set X) : (A \ univ) = ∅ :=
+begin
+  apply subset_antisymmetric,
+  split,
+  intros x hx,
+  cases hx,
+  apply false.elim,
+  apply hx_right,
+  trivial,
+  apply empty_set_subset,
+end
 
 theorem diff_by_subset_superset {X : Type u} {A : set X} {B : set X} {B' : set X} (hB'B : B' ⊆ B) : A \ B ⊆ A \ B' :=
 begin
@@ -468,6 +559,19 @@ begin
   apply hxninB,
   apply hB'B,
   exact h,
+end
+
+theorem empty_set_diff {X : Type u} (A : set X) : A \ ∅ = A :=
+begin
+  apply subset_antisymmetric,
+  split,
+  apply difference_in_numerator,
+  intros a ha,
+  split,
+  assumption,
+  simp,
+  intro ab,
+  exact ab,
 end
 
 theorem deMorgenUnion {X : Type u} (C : set (set X)) :  univ \ (⋃₀ C) = ⋂₀ image (λ A, univ \ A) C := 
@@ -506,18 +610,6 @@ begin
   cases hcon,
   apply hcon_right,
   exact hxinA,
-end
-
-theorem exists_not_of_not_exists {α :Sort u} {p : α → Prop} : (¬(∀ x : α , p x)) → ∃ x : α , ¬(p x) :=
-begin
-  intro h₁,
-  by_contradiction,
-  have h₂ := forall_not_of_not_exists h,
-  simp at h₂,
-  apply h₁,
-  intro x,
-  apply not_not,
-  apply h₂,
 end
 
 theorem deMorgenInter {X : Type u} (C : set (set X)) :  univ \ (⋂₀ C) = ⋃₀ image (λ A, univ \ A) C := 

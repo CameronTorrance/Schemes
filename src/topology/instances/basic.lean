@@ -1,5 +1,6 @@
 import topology.basic
 
+
 namespace topology
 
 universe u 
@@ -108,6 +109,47 @@ begin
   exact subspace_abitary_unions_open S,
   exact subspace_pairwise_inters_open S,
 end
+structure closed_topology (X : Type u) :=
+  (closed_b : set X → Prop)
+  (whole_space_closed : closed_b univ)
+  (empty_set_closed : closed_b ∅)
+  (arbitary_inters_closed (s: set (set X)) : (∀ t : set X, t ∈ s → closed_b t) → closed_b (⋂₀ s))
+  (pairwise_unions_open : ∀ s t : set X, closed_b s → closed_b t → closed_b (s ∪ t))
+
+def from_closed_topology (X : Type u) (ct : closed_topology X) : topology X :=
+{
+  is_open := λ S, ct.closed_b (univ \ S),
+  empty_set_open :=
+    begin
+      rw empty_set_diff,
+      apply ct.whole_space_closed,
+    end,
+  whole_space_closed :=
+    begin
+      rw diff_of_univ_empty,
+      apply ct.empty_set_closed,
+    end,
+  arbitary_unions_open :=
+    begin
+      intros C hC,
+      rw deMorgenUnion,
+      apply ct.arbitary_inters_closed,
+      intros S hS,
+      cases hS with A hA,
+      cases hA with AinC Arw,
+      rw ← Arw,
+      apply hC,
+      exact AinC,
+    end,
+  pairwise_inters_open :=
+    begin
+      intros U₁ U₂ hU₁ hU₂,
+      rw ← sinter_to_inter,
+      rw deMorgenInter,
+      
+    end,
+}
+
 
 
 

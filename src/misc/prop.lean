@@ -2,6 +2,8 @@ universe u
 
 open classical
 
+
+
 theorem not_or_and_not : ∀ { p q : Prop}, ¬ (p ∨ q) → ¬ p ∧ ¬ q :=
 begin
   intros p q h,
@@ -22,6 +24,7 @@ begin
   by_contradiction,
   exact nnp h,
 end
+
 
 theorem exists_not_of_not_exists {α :Sort u} {p : α → Prop} : (¬(∀ x : α , p x)) → ∃ x : α , ¬(p x) :=
 begin

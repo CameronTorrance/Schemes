@@ -3,7 +3,7 @@ import category_theory.basic
 import category_theory.instances
 import category_theory.universal_properties.limit_colimt
 
-universes v u 
+universes v v₁ v₂ u u₁ u₂ 
 
 open category
 open topology
@@ -75,18 +75,18 @@ begin
   apply inclusion_equality,
 end
 
-def stalk_functor {X : Type v} [topology X] {C : Type u} [category.{v} C] {S : concrete_category.{v} C} 
+def stalk_shape {X : Type v} [topology X] {C : Type u} [category.{v} C] {S : concrete_category.{v} C} 
   (𝓕 : sheaf X S) (p : X) : opposite ({O: Open X // p ∈ O}) +→ C := 𝓕.body ⊚ (op_functor (open_at_point_forget p))
 
 noncomputable def stalk {X : Type v} [topology X] {C : Type u} [category.{v} C] {S : concrete_category.{v} C} 
   (𝓕 : sheaf X S) (p : X) 
-  : Σ st : C, (Π oOp : opposite ({O: Open X // p ∈ O}), Mor ((stalk_functor 𝓕 p).map oOp) st) 
-  := filtered_colimit (op_open_sets_at_a_point_filtered_category p) S (stalk_functor 𝓕 p)
+  : Σ st : C, (Π oOp : opposite ({O: Open X // p ∈ O}), Mor ((stalk_shape 𝓕 p).map oOp) st) 
+  := filtered_colimit (op_open_sets_at_a_point_filtered_category p) S (stalk_shape 𝓕 p)
 
 theorem stalk_property {X : Type v} [topology X] {C : Type u} [category.{v} C] {S : concrete_category.{v} C} 
   (𝓕 : sheaf X S) (p : X) 
-  : is_colimit (stalk_functor 𝓕 p) (stalk 𝓕 p)
-  := filtered_colimit_property (op_open_sets_at_a_point_filtered_category p) S (stalk_functor 𝓕 p)
+  : is_colimit (stalk_shape 𝓕 p) (stalk 𝓕 p)
+  := filtered_colimit_property (op_open_sets_at_a_point_filtered_category p) S (stalk_shape 𝓕 p)
 
 
 end sheaf
