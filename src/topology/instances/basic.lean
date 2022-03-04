@@ -114,7 +114,7 @@ structure closed_topology (X : Type u) :=
   (whole_space_closed : closed_b univ)
   (empty_set_closed : closed_b ∅)
   (arbitary_inters_closed (s: set (set X)) : (∀ t : set X, t ∈ s → closed_b t) → closed_b (⋂₀ s))
-  (pairwise_unions_open : ∀ s t : set X, closed_b s → closed_b t → closed_b (s ∪ t))
+  (pairwise_inters_closed : ∀ s t : set X, closed_b s → closed_b t → closed_b (s ∪ t))
 
 def from_closed_topology (X : Type u) (ct : closed_topology X) : topology X :=
 {
@@ -124,7 +124,7 @@ def from_closed_topology (X : Type u) (ct : closed_topology X) : topology X :=
       rw empty_set_diff,
       apply ct.whole_space_closed,
     end,
-  whole_space_closed :=
+  whole_space_open :=
     begin
       rw diff_of_univ_empty,
       apply ct.empty_set_closed,
@@ -146,12 +146,14 @@ def from_closed_topology (X : Type u) (ct : closed_topology X) : topology X :=
       intros U₁ U₂ hU₁ hU₂,
       rw ← sinter_to_inter,
       rw deMorgenInter,
-      
+      rw image_of_list_to_set,
+      have trv : list.map (λ A, univ \ A) [U₁,U₂] = 
+        [univ \ U₁, univ \ U₂] := rfl,
+      rw [trv,sunion_to_union],
+      apply closed_topology.pairwise_inters_closed,
+      exact hU₁,
+      exact hU₂,
     end,
 }
-
-
-
-
 
 end topology

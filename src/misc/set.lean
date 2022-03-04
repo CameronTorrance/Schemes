@@ -242,6 +242,17 @@ begin
   exact hA,
 end 
 
+theorem empty_union {X : Type u} : ⋃₀ (∅ : set (set X)) = ∅ :=
+begin
+  apply subset_antisymmetric,
+  split,
+  intros x hx,
+  cases hx with A hA,
+  cases hA with ab _,
+  exact ab,
+  apply empty_set_subset,
+end
+
 theorem union_subset {X : Type u} {A B : set X} : A ⊆ B → B ∪ A = B :=
 begin
   intro h,
