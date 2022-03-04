@@ -1,9 +1,11 @@
 import category_theory.basic
 import category_theory.instances
 
-open classical
 
-universes v vᵢ u uᵢ uₛ
+
+universes v vᵢ vₒ u uᵢ uₒ
+
+open classical
 
 namespace category
 
@@ -54,30 +56,69 @@ begin
   rw [← hrw, ← comp_assoc,hψ₁,id_comp_right],
 end 
 
-
 /-
   Using a nonstandard defintion of concrete category based on the idea
   that I'm only using the defn for sheaf, and need them to commute with
   colimits to define stalks. 
+
+  I say that functor F : C → D commutes with colimits if for all functors
+  G : J → C, G has a colimit if and only if F ∘ G has a colimit,
+  and the cannoial morphism d → F(c) is an isomorphism where c, d are 
+  colimits of G and (F ∘ G) respectively.
 -/
+
+def image_of_colimit {C : Type u} [category.{v} C] {D : Type uₒ} [category.{vₒ} D] {J : Type uᵢ} 
+  [category.{vᵢ} J] {F : J +→ C} (G : C +→ D) (c : Σ cl : C, Π i : J, Mor (F.map i) cl)
+  : Σ d : D, Π i : J, Mor ((G ⊚ F).map i) d := ⟨G.map c.1, λ i : J, G.fmap (c.2 i)⟩ 
+
+theorem image_of_colimit_cocone {C : Type u} [category.{v} C] {D : Type uₒ} [category.{vₒ} D] {J : Type uᵢ} 
+  [category.{vᵢ} J] {F : J +→ C} (G : C +→ D) {c : Σ cl : C, Π i : J, Mor (F.map i) cl} (hc : is_colimit F c)
+  : is_cocone (G ⊚ F) (image_of_colimit G c) :=
+begin
+  intros i₁ i₂ f,
+  simp,
+  have hrw : (G ⊚ F).fmap f = G.fmap (F.fmap f) := rfl,
+  cases c,
+  rw [hrw,← G.fmap_prevs_comp],
+  cases hc,
+  simp [is_cocone] at hc_left,
+  rw ← hc_left i₁ i₂ f,
+end
+
+theorem exists_image_of_colimit_can_mor {C : Type u} [category.{v} C] {D : Type uₒ} [category.{vₒ} D] {J : Type uᵢ} 
+  [category.{vᵢ} J] {F : J +→ C} {G : C +→ D} {c : Σ cl : C, Π i : J, Mor (F.map i) cl} 
+  {d : Σ dl : D, Π i : J, Mor ((G ⊚ F).map i) dl} (hc : is_colimit F c) (hd : is_colimit (G ⊚ F) d)
+  : ∃! φ : Mor d.1 (image_of_colimit G c).1, ∀ i : J, (image_of_colimit G c).2 i = φ ∘ₘ (d.2 i) :=
+begin
+  cases hd with dcocone duni,
+  apply duni,
+  apply image_of_colimit_cocone,
+  exact hc,
+end
+
+noncomputable def image_of_colimit_can_mor {C : Type u} [category.{v} C] {D : Type uₒ} [category.{vₒ} D] {J : Type uᵢ} 
+  [category.{vᵢ} J] {F : J +→ C} {G : C +→ D} {c : Σ cl : C, Π i : J, Mor (F.map i) cl} 
+  {d : Σ dl : D, Π i : J, Mor ((G ⊚ F).map i) dl} (hc : is_colimit F c) (hd : is_colimit (G ⊚ F) d)
+  : Mor d.1 (image_of_colimit G c).1 := some (exists_image_of_colimit_can_mor hc hd)
+
+theorem image_of_colimit_can_mor_property {C : Type u} [category.{v} C] {D : Type vₒ} [category.{vₒ} D] {J : Type uᵢ} 
+  [category.{vᵢ} J] {F : J +→ C} {G : C +→ D} {c : Σ cl : C, Π i : J, Mor (F.map i) cl} 
+  {d : Σ dl : D, Π i : J, Mor ((G ⊚ F).map i) dl} (hc : is_colimit F c) (hd : is_colimit (G ⊚ F) d)
+  : (∀ i : J, (image_of_colimit G c).2 i = (image_of_colimit_can_mor hc hd) ∘ₘ (d.2 i)) ∧ (∀ ϕ : Mor d.1 (image_of_colimit G c).1,
+  (∀ i : J, (image_of_colimit G c).2 i = ϕ ∘ₘ (d.2 i)) → ϕ = (image_of_colimit_can_mor hc hd)) 
+  := some_spec (exists_image_of_colimit_can_mor hc hd)
 
 structure concrete_category (C : Type u) [category.{v} C] :=
   (val : C +→ Type v)
   (property : faithful_functor val)
-  (filtered_colimits_up : ∀ (J : Type v) [category.{v} J] 
-    [nonempty J] (hJ : filtered_category J) (F : J +→ C), 
-    ∀ c : (Σ cl : C, Π i : J, Mor (F.map i) cl) , is_colimit F c →
-    is_colimit (val ⊚ F) ⟨val.map c.1, λ i : J, val.fmap (c.2 i)⟩)
-  (filtered_colimits_down : ∀ (J : Type v) [category.{v} J] 
-    [nonempty J] (hJ : filtered_category J) (F : J +→ C),  
-    ∀ c : (Σ cl : Type v, Π i : J, Mor ((val⊚F).map i) cl), is_colimit (val ⊚ F) c → 
-    ∃ (s' : Type v) (c' : C) (f : Mor c.1 s'), isomorphism f ∧ val.map c' = s')
-
-/-
-  want to show that a functor F : J → Set, where J is a filtered category, has colimit
-  i.e Σ i : J, F i / ~ where (i₁,s₁) ~ (i₂,s₂) iff ∃ k, f₁ : Mor i₁ k , f₂ : Mor i₂ k  such that 
-  F f₁ (s₁) = F f₂ (s₂). 
--/
+  (up_colimits_iff_down_colimits : ∀ {J : Type v} [category.{v} J] [nonempty J] 
+  (hJ : filtered_category J) {F : J +→ C},
+  (∃ c : (Σ cl : C, Π i : J, Mor (F.map i) cl), is_colimit F c) ↔ 
+  (∃ d : (Σ dl : Type v, Π i : J, Mor ((val ⊚ F).map i) dl), is_colimit (val ⊚ F) d))
+  (colimit_can_iso : ∀ {J : Type v} [category.{v} J] [nonempty J] 
+  (hJ : filtered_category J) {F : J +→ C} {c : Σ cl : C, Π i : J, Mor (F.map i) cl} 
+  {d : Σ dl : Type v, Π i : J, Mor ((val ⊚ F).map i) dl} (hc : is_colimit F c) 
+  (hd : is_colimit (val ⊚ F) d), isomorphism (image_of_colimit_can_mor hc hd))
 
 theorem set_comp_app : ∀ {A₁ A₂ A₃ : Type u} (f₁ : Mor A₂ A₃) (f₂ : Mor A₁ A₂) (s : A₁), 
   ((f₁ ∘ₘ f₂) : A₁ → A₃) s =  f₁ ( f₂ s) := λ _ _ _ _ _ _, rfl
@@ -247,7 +288,16 @@ end
 
 theorem concrete_category_has_filtered_colimits {C : Type u} [category.{v} C] {J : Type v} [category.{v} J] 
   [nonempty J] (hJ : filtered_category J) (S : concrete_category C) (F : J +→ C) 
-  : ∃ c : (Σ cl : C, Π i : J, Mor (F.map i) cl), is_colimit F c := sorry
+  : ∃ c : (Σ cl : C, Π i : J, Mor (F.map i) cl), is_colimit F c := 
+begin
+  cases S with S Sfaithful Sexist Scaniso,
+  let setcolimit := filtered_colimit_set hJ (S ⊚ F),
+  have setcolimit_colimit : is_colimit (S ⊚ F) setcolimit := filtered_colimit_set_colimit hJ (S ⊚ F),
+  rw Sexist,
+  existsi setcolimit,
+  exact setcolimit_colimit,
+  exact hJ,
+end
 
 noncomputable def filtered_colimit {C : Type u} [category.{v} C] {J : Type v} [category.{v} J] 
   [nonempty J] (hJ : filtered_category J) (S : concrete_category C) (F : J +→ C)
