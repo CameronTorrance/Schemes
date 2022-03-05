@@ -54,6 +54,14 @@ begin
   exact (fdat S).property,
 end
 
+lemma pre_image_prevs_subset {X : Type u} {Y : Type v} {A₁ A₂ : set Y} (f : X → Y) 
+  (hA₁A₂ : A₁ ⊆ A₂) : (pre_image f A₁) ⊆ (pre_image f A₂) :=
+begin
+  intros x hx,
+  apply hA₁A₂,
+  exact hx,
+end
+
 /-
   Some trival results about subsets and set eqaulity so I'm not alway having to apply funext/propext
   to every lemma.

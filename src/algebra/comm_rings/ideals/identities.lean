@@ -189,4 +189,18 @@ begin
   apply ideal.contains_zero,
 end  
 
+theorem set_in_ideal_gen_by_set {R : Type u} [comm_ring R] (S : set R) 
+  : S ⊆ ideal_generated_by_set S :=
+begin
+  intros s hs,
+  apply linear_combination.add_term,
+  trivial,
+  exact hs,
+  apply linear_combination.empty_sum,
+  rw add_zero,
+  rw mul_comm,
+  rw mul_one,
+end
+
+
 end comm_ring

@@ -157,7 +157,15 @@ begin
   rw [nat.add_zero n,power_of_zero,mul_one],
   rw [nat.add_succ,power_of_succ,power_of_succ,hm],
   rw mul_assoc,
-end 
+end
+
+lemma power_of_power {R : Type u} [comm_ring R] (a : R) : ∀ n m : ℕ, (a^n)^m = a^(n*m) :=
+begin
+  intros n m,
+  induction m with m hm,
+  rw [nat.mul_zero,power_of_zero,power_of_zero],
+  rw [power_of_succ,nat.mul_succ,hm,power_of_add],
+end
 
 def nat_to_ring (R :Type u) [comm_ring R] : ℕ → R 
   | 0            := 0

@@ -17,8 +17,8 @@ class topology (X : Type u) :=
 
 def is_open {X : Type u} [T_X: topology X] : set X → Prop := T_X.is_open
 
-def is_continous_map {X : Type u} {Y : Type v}[T_X : topology X][T_Y : topology Y] (f : X → Y) : Prop :=
-∀ s : set Y , is_open s → is_open (pre_image f s)
+def is_continous_map {X : Type u} {Y : Type v} [T_X : topology X][T_Y : topology Y] (f : X → Y) : Prop :=
+∀ {s : set Y} , is_open s → is_open (pre_image f s)
 
 structure Open (X : Type u) [topology X] : Type u:=
   (val : set X)
@@ -144,6 +144,24 @@ def open_at_point_forget {X : Type u} [topology X] (p : X) : {O: Open X // p ∈
 {
   map := λ O, O.val,
   fmap := λ O₁ O₂ f, f,
+  fmap_prevs_comp := λ _ _ _ _ _, rfl,
+  fmap_prevs_id := λ _, rfl,
+}
+
+
+def open_transport {X : Type u} [topology X] {Y : Type v} [topology Y] 
+  {f : X → Y} (hf : is_continous_map f) : Open Y +→ Open X :=
+{
+  map := λ O_Y, ⟨pre_image f O_Y.val, hf O_Y.val_open⟩,
+  fmap :=
+    begin
+      intros O₁ O₂ i,
+      cases i,
+      split,
+      simp,
+      apply pre_image_prevs_subset,
+      assumption,
+    end,
   fmap_prevs_comp := λ _ _ _ _ _, rfl,
   fmap_prevs_id := λ _, rfl,
 }

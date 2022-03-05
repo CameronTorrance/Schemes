@@ -357,4 +357,39 @@ begin
   exact hint,
 end 
 
+theorem ideal_subset_of_radical {R : Type u} [comm_ring R] (I:ideal R)
+  : I.body ⊆ (√I).body :=
+begin
+  intros x hx,
+  rw elements_of_radical I,
+  existsi 0,
+  rw power_of_one,
+  exact hx,
+end
+
+theorem radical_idempotent {R : Type u} [comm_ring R] (I:ideal R)
+  : (√√I) = √I :=
+begin
+  apply ideal_equality,
+  apply subset_antisymmetric,
+  split,
+  intros x hx,
+  rw elements_of_radical,
+  rw elements_of_radical at hx,
+  cases hx with n hx,
+  rw elements_of_radical at hx,
+  cases hx with m hx,
+  existsi n * m + n + m,
+  have hrw : (x^(n.succ))^m.succ = x^(n * m + n + m).succ,
+    rw power_of_power,
+    have sub : n.succ * m.succ = (n * m + n + m).succ,
+      rw nat.succ_mul,
+      rw nat.add_succ,
+      rw nat.mul_succ,
+    rw sub,
+  rw ← hrw,
+  exact hx,
+  apply ideal_subset_of_radical,
+end
+
 end comm_ring
