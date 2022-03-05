@@ -20,6 +20,25 @@ begin
   rw add_zero,
 end
 
+lemma product_of_ideals_in_intersection {R : Type u} [comm_ring R] {I₁ I₂ : ideal R}
+  : (↑(I₁ * I₂) : set R) ⊆ ↑(I₁ ∩ I₂) :=
+begin
+  intros x hx,
+  induction hx with x i₁ i₂ l hi₁ hi₂ hl₁ hx hl₂,
+  exact (I₁ ∩ I₂).contains_zero,
+  rw hx,
+  apply (I₁ ∩ I₂).add_closure,
+  have trv₁ : ↑(I₁ ∩ I₂) = (I₁ ∩ I₂).body := rfl, 
+  rw [←trv₁,ideal_pairwise_inter_set],
+  split,
+  rw mul_comm,
+  apply I₁.mul_absorb,
+  exact hi₁,
+  apply I₂.mul_absorb,
+  exact hi₂,
+  exact hl₂,
+end
+
 lemma product_of_ideal_extension {R : Type u} [comm_ring R] {I : ideal R}
   : ∀ {x y : R}, ((I + princple_ideal x) * (I + princple_ideal y)).body ⊆ (I + princple_ideal (x * y)).body :=
 begin

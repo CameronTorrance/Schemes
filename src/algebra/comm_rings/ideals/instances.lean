@@ -396,7 +396,47 @@ end
 
 prefix `⋂₀`:110 := intersection_of_ideals
 
+instance ideals_have_inter {R : Type u} [comm_ring R] : has_inter (ideal R) := ⟨ λ I₁ I₂, ⋂₀ (list_to_set [I₁,I₂])⟩  
 
+theorem ideal_pairwise_inter_set {R : Type u} [comm_ring R] (I₁ I₂ : ideal R) 
+  : (↑(I₁ ∩ I₂) : set R) = ↑I₁ ∩ ↑I₂ :=
+begin
+  cases list_to_set_pair_mem ↑I₁ ↑I₂ with hI₁ hI₂,
+  have trv₁ : I₁ ∩ I₂ = ⋂₀ (list_to_set [I₁,I₂]) := rfl,
+  rw trv₁,
+  have trv₂ : ↑I₁ = I₁.body := rfl,
+  have trv₃ : ↑I₂ = I₂.body := rfl,
+  have trv₄ : list.map (λ I :ideal R, I.body) [I₁,I₂] = [↑I₁,↑I₂],
+    rw [trv₂,trv₃],
+    refl,
+  apply subset_antisymmetric,
+  split,
+  intros x hx,
+  split,
+  apply hx,
+  rw image_of_list_to_set,
+  rw trv₄,
+  exact hI₁,
+  apply hx,
+  rw image_of_list_to_set,
+  rw trv₄,
+  exact hI₂,
+  intros x hx,
+  intros A hA,
+  rw image_of_list_to_set at hA,
+  rw trv₄ at hA,
+  cases hA,
+  rw hA,
+  apply intersection_in_set,
+  assumption,
+  cases hA,
+  rw hA,
+  apply intersection_in_set,
+  rw intersection_commuative,
+  assumption,
+  apply false.elim,
+  exact hA, 
+end 
 
 def preimage_set {R₁ : Type u} [comm_ring R₁] {R₂ : Type v} [comm_ring R₂] (φ : R₁ →ᵣ R₂) (I : ideal R₂) : set R₁ :=
   λ r : R₁, φ r ∈ I.body 
