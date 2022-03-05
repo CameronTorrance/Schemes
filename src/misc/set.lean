@@ -205,7 +205,8 @@ begin
   exact hx,
 end
 
-theorem bounded_union_in_bound {X : Type u} {α : set (set X)} {V : set X} : (∀ U : set X, U ∈ α → U ⊆ V) → ⋃₀ α ⊆ V :=
+theorem bounded_union_in_bound {X : Type u} {α : set (set X)} {V : set X} 
+  : (∀ U : set X, U ∈ α → U ⊆ V) → ⋃₀ α ⊆ V :=
 begin
   intros h x hx,
   cases hx with U hU,
@@ -213,7 +214,8 @@ begin
   exact h U hU hx,
 end
 
-theorem union_upper_bound {X : Type u} {α : set (set X)} : ∀ U : set X, U ∈ α → U ⊆ ⋃₀ α :=
+theorem union_upper_bound {X : Type u} {α : set (set X)} 
+  : ∀ U : set X, U ∈ α → U ⊆ ⋃₀ α :=
 begin
   intros U hUinα x hxinU,
   existsi U,
