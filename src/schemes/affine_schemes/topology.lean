@@ -4,11 +4,12 @@ import algebra.comm_rings.ideals.instances
 import algebra.comm_rings.ideals.identities
 import algebra.comm_rings.ideals.radicals
 import topology.basic
+import topology.instances.basic
 import misc.set
 
 universes v u 
 
-open set comm_ring topology
+open set comm_ring topology classical
 
 namespace scheme
 
@@ -112,5 +113,109 @@ begin
   rw h,
   apply p.contains_zero,
 end
+
+theorem vanishing_set_of_inter {R : Type u} [comm_ring R] (I₁ I₂ : ideal R)
+  : vanishing_set (↑(I₁ ∩ I₂) : set R) = (vanishing_set I₁) ∪ (vanishing_set I₂) :=
+begin
+  apply subset_antisymmetric,
+  split,
+  intro p,
+  apply contrapostive,
+  intro hp,
+  cases not_in_union hp,
+  cases not_subset_some_element_in_diff left with f₁ hf₁,
+  cases not_subset_some_element_in_diff right with f₂ hf₂,
+  cases hf₁ with f₁inI₁ f₁ninp,
+  cases hf₂ with f₂inI₂ f₂ninp,
+  intro ab,
+  have f₁f₂ninp : f₁ * f₂ ∉ ↑p,
+    intro ab,
+    cases p.prime f₁ f₂ ab,
+    apply f₁ninp,
+    assumption,
+    apply f₂ninp,
+    assumption,
+  apply f₁f₂ninp,
+  apply ab,
+  rw ideal_pairwise_inter_set,
+  split,
+  rw mul_comm,
+  apply I₁.mul_absorb,
+  assumption,
+  apply I₂.mul_absorb,
+  assumption,
+  have h₁ : vanishing_set ↑I₁ ⊆ vanishing_set (↑(I₁ ∩ I₂) :set R),
+    apply vanishing_set_reverses_order,
+    rw ideal_pairwise_inter_set,
+    apply intersection_in_set,
+  have h₂ : vanishing_set ↑I₂ ⊆ vanishing_set (↑(I₁ ∩ I₂) :set R),
+    apply vanishing_set_reverses_order,
+    rw ideal_pairwise_inter_set,
+    rw intersection_commuative,
+    apply intersection_in_set,
+  intros p hp,
+  cases hp,
+  apply h₁,
+  exact hp,
+  apply h₂,
+  exact hp,
+end
+
+def prime_spectrum_closed_topology (R : Type u) [comm_ring R] : closed_topology (Spec R) :=
+{
+  closed_b := λ S : set (Spec R), ∃ A : set R, vanishing_set A = S,
+  whole_space_closed :=
+    begin
+      existsi (λ x : R, x = 0),
+      rw vanishing_set_of_zero,
+    end,
+  empty_set_closed :=
+    begin
+      existsi univ,
+      rw vanishing_set_of_univ,
+    end,
+  pairwise_unions_closed :=
+    begin
+      intros S₁ S₂ hS₁ hS₂,
+      cases hS₁ with A₁ hA₁,
+      cases hS₂ with A₂ hA₂,
+      existsi ↑((ideal_generated_by_set A₁) ∩ (ideal_generated_by_set A₂)),
+      rw vanishing_set_of_inter,
+      simp [← vanishing_set_can_move_to_ideals,hA₁,hA₂],
+    end,
+  arbitary_inters_closed :=
+    begin
+      intros C hC,
+      let data := λ S hS, some (hC S hS),
+      have hdata : Π S hS, vanishing_set (data S hS) = S := 
+        λ S hS, some_spec (hC S hS),
+      let C' : set (set R) := λ S', ∃ S hS, S' = data S hS,
+      have hC' : C = image vanishing_set C',
+        apply subset_antisymmetric,
+        split,
+        intros S hS,
+        existsi data S hS,
+        split,
+        existsi S,
+        existsi hS,
+        refl,
+        apply hdata,
+        intros S hS,
+        cases hS with W hW,
+        cases hW with WinC' Wrw,
+        cases WinC' with A hA,
+        cases hA with AinC hA,
+        rw ← Wrw,
+        rw hA,
+        rw hdata,
+        assumption,
+        rw hC',
+        existsi ⋃₀ C',
+        rw vanishing_set_of_union,
+    end,
+}
+
+instance prime_spectrum_topology (R : Type u) [comm_ring R] : topology (Spec R)
+  := from_closed_topology (prime_spectrum_closed_topology R)
 
 end scheme

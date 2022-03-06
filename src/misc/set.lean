@@ -595,6 +595,35 @@ begin
   exact ab,
 end
 
+theorem not_in_union {X : Type u} {A₁ A₂ : set X} {x : X} : x ∉ (A₁ ∪ A₂) → x ∉ A₁ ∧ x ∉ A₂ :=
+begin
+  intro h,
+  split,
+  intro ab,
+  apply h,
+  left,
+  exact ab,
+  intro ab,
+  apply h,
+  right,
+  exact ab,
+end
+
+theorem not_subset_some_element_in_diff {X : Type u} {A₁ A₂ : set X} (hns : ¬ (A₁ ⊆ A₂))
+  : ∃ x, x ∈ A₁ ∧ x ∉ A₂ :=
+begin
+  by_contradiction,
+  have h₁ := forall_not_of_not_exists h,
+  apply hns,
+  intros a ha,
+  cases not_and_or_not (h₁ a) with h₂,
+  apply false.elim,
+  apply h₂,
+  assumption,
+  apply not_not,
+  assumption,
+end
+
 theorem deMorgenUnion {X : Type u} (C : set (set X)) :  univ \ (⋃₀ C) = ⋂₀ image (λ A, univ \ A) C := 
 begin
   apply subset_antisymmetric,

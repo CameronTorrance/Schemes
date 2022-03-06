@@ -109,14 +109,15 @@ begin
   exact subspace_abitary_unions_open S,
   exact subspace_pairwise_inters_open S,
 end
+
 structure closed_topology (X : Type u) :=
   (closed_b : set X → Prop)
   (whole_space_closed : closed_b univ)
   (empty_set_closed : closed_b ∅)
   (arbitary_inters_closed (s: set (set X)) : (∀ t : set X, t ∈ s → closed_b t) → closed_b (⋂₀ s))
-  (pairwise_inters_closed : ∀ s t : set X, closed_b s → closed_b t → closed_b (s ∪ t))
+  (pairwise_unions_closed : ∀ s t : set X, closed_b s → closed_b t → closed_b (s ∪ t))
 
-def from_closed_topology (X : Type u) (ct : closed_topology X) : topology X :=
+def from_closed_topology {X : Type u} (ct : closed_topology X) : topology X :=
 {
   is_open := λ S, ct.closed_b (univ \ S),
   empty_set_open :=
@@ -150,7 +151,7 @@ def from_closed_topology (X : Type u) (ct : closed_topology X) : topology X :=
       have trv : list.map (λ A, univ \ A) [U₁,U₂] = 
         [univ \ U₁, univ \ U₂] := rfl,
       rw [trv,sunion_to_union],
-      apply closed_topology.pairwise_inters_closed,
+      apply closed_topology.pairwise_unions_closed,
       exact hU₁,
       exact hU₂,
     end,
