@@ -150,4 +150,44 @@ notation R `[`S `⁻¹]` := localisation R S
 def localisation_pre_add {R : Type u} [comm_ring R] (S : mul_closed_set R) : R × S → R × S → R[S⁻¹] 
   | (x₁,s₁) (x₂,s₂) := ⟦(x₁ * s₂ + x₂ * s₁, s₁ * s₂)⟧
 
+theorem localisation_pre_add_lifts {R : Type u} [comm_ring R] (S : mul_closed_set R) 
+  : ∀ a₁ a₂ b₁ b₂ : R × S, a₁ ≈ b₁ → a₂ ≈ b₂ → localisation_pre_add S a₁ a₂ = localisation_pre_add S b₁ b₂ :=
+begin
+  intros a₁ a₂ b₁ b₂ h₁ h₂,
+  cases a₁ with ax₁ as₁,
+  cases a₂ with ax₂ as₂,
+  cases b₁ with bx₁ bs₁,
+  cases b₂ with bx₂ bs₂,
+  simp [localisation_pre_add],
+  apply quotient.sound,
+  cases h₁ with s₁ hs₁,
+  cases h₂ with s₂ hs₂,
+  simp at hs₁,
+  simp at hs₂,
+  let s := s₁ * s₂,
+  have hs : ↑s = ↑s₁ * ↑s₂,
+    simp[s],
+    rw mcs_mul_coe,
+  let as := as₁ * as₂,
+  have has : ↑as = ↑as₁ * ↑as₂,
+    simp[as],
+  let bs := bs₁ * bs₂,
+  have hbs : ↑bs = ↑bs₁ * ↑bs₂,
+    simp[bs],
+  have v₁ : ↑s * (ax₁ * bs₁ + -(bx₁ * as₁)) = 0,
+    simp [s],
+    rw mul_comm (↑s₁ : R) s₂,
+    rw [← mul_assoc, hs₁, mul_zero],
+  have v₂ : ↑s * (ax₂ * bs₂ + -(bx₂ * as₂)) = 0,
+    simp [s],
+    rw [← mul_assoc, hs₂, mul_zero],
+  existsi s,
+  simp,
+  rw ← hs,
+  have sub₁ : (ax₁ * as₂ + ax₂ * as₁) * (↑bs₁ * ↑bs₂) = (ax₁ * bs₁) * bs +  
+
+
+end
+
+
 end comm_ring

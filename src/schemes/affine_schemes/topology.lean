@@ -218,4 +218,15 @@ def prime_spectrum_closed_topology (R : Type u) [comm_ring R] : closed_topology 
 instance prime_spectrum_topology (R : Type u) [comm_ring R] : topology (Spec R)
   := from_closed_topology (prime_spectrum_closed_topology R)
 
+
+def distinguished_open_set {R : Type u} [comm_ring R] : R → set (Spec R)  
+  := λ x, univ \ (vanishing_set (princple_ideal x))
+
+theorem distinguished_opens_open {R : Type u} [comm_ring R] : ∀ x : R, is_open (distinguished_open_set x) :=
+begin
+  intro x,
+  existsi (↑(princple_ideal x): set R),
+  simp [distinguished_open_set],
+end
+
 end scheme

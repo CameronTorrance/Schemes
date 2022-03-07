@@ -88,5 +88,42 @@ theorem stalk_property {X : Type v} [topology X] {C : Type u} [category.{v} C] {
   : is_colimit (stalk_shape 𝓕 p) (stalk 𝓕 p)
   := filtered_colimit_property (op_open_sets_at_a_point_filtered_category p) S (stalk_shape 𝓕 p)
 
+instance sheaf_category {X : Type v} [topology X] {C : Type u} [category.{v} C] {S : concrete_category.{v} C}
+  : category (sheaf X S) :=
+{
+  Mor := λ 𝓕₁ 𝓕₂, 𝓕₁.body →ₙ 𝓕₂.body,
+  idₘ := λ 𝓕, idₙ 𝓕.body,
+  comp := λ F₁ F₂ F₃ φ₁ φ₂, φ₁ ∘ₙ φ₂,
+  comp_assoc :=
+    begin
+      intros F₁ F₂ F₃ F₄ φ₁ φ₂ φ₃,
+      apply natural_trans_equality,
+      apply funext,
+      intro,
+      simp,
+      rw comp_assoc,
+    end,
+  id_comp_left := 
+    begin
+      intros F₁ F₂ φ,
+      apply natural_trans_equality,
+      apply funext,
+      intro,
+      rw natural_trans_comp_map,
+      simp,
+      rw id_comp_left,
+    end,
+  id_comp_right := 
+    begin
+      intros F₁ F₂ φ,
+      apply natural_trans_equality,
+      apply funext,
+      intro,
+      rw natural_trans_comp_map,
+      simp,
+      rw id_comp_right,
+    end, 
+}
+
 
 end sheaf
