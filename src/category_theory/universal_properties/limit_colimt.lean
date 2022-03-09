@@ -13,6 +13,7 @@ def filtered_category (C : Type u) [nonempty C] [category.{v} C] : Prop
   := (∀ i₁ i₂ : C, ∃ (j : C), nonempty (Mor i₁ j) ∧ nonempty (Mor i₂ j)) 
       ∧ (∀ (i j : C) (f₁ f₂ : Mor i j), ∃ (k : C) (w : Mor j k), w ∘ₘ f₁ = w ∘ₘ f₂)  
 
+@[reducible]
 def is_cocone {C: Type u} [category.{v} C] {I : Type uᵢ} [category.{vᵢ} I] (F : I +→ C) 
   : (Σ cl : C, Π i : I, Mor (F.map i) cl) → Prop 
   | ⟨cl ,j⟩ := ∀ (i₁ i₂ : I) (f : Mor i₁ i₂), j i₁ = (j i₂) ∘ₘ (F.fmap f)

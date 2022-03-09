@@ -126,4 +126,45 @@ instance sheaf_category {X : Type v} [topology X] {C : Type u} [category.{v} C] 
 }
 
 
+noncomputable def natural_trans_im_cocone {X : Type v} [topology X] {C : Type u} [category.{v} C]
+  {S : concrete_category C} {𝓕₁ 𝓕₂ : sheaf X S} (φ : Mor 𝓕₁ 𝓕₂) (p : X) 
+  : Σ c : C, Π O : opposite {O : Open X // p ∈ O}, Mor (𝓕₁.body.map (op O.val)) c
+  := ⟨(stalk 𝓕₂ p).1, λ O : opposite {O : Open X // p ∈ O}, ((stalk 𝓕₂ p).2 ( O))∘ₘ(φ.map (op O.val))⟩
+
+theorem natural_trans_im_cocone_obj {X : Type v} [topology X] {C : Type u} [category.{v} C]
+  {S : concrete_category C} {𝓕₁ 𝓕₂ : sheaf X S} (φ : Mor 𝓕₁ 𝓕₂) (p : X) 
+  : (natural_trans_im_cocone φ p).1 = (stalk 𝓕₂ p).1 := rfl
+
+theorem natural_trans_im_cocone_map {X : Type v} [topology X] {C : Type u} [category.{v} C]
+  {S : concrete_category C} {𝓕₁ 𝓕₂ : sheaf X S} (φ : Mor 𝓕₁ 𝓕₂) (p : X)
+  : (natural_trans_im_cocone φ p).2 = λ O : opposite {O : Open X // p ∈ O}, ((stalk 𝓕₂ p).2 O)∘ₘ(φ.map (op O.val))
+  := rfl
+
+theorem existance_of_induced_morphism_of_stalks {X : Type v} [topology X] {C : Type u} [category.{v} C]
+  (S : concrete_category C) {𝓕₁ 𝓕₂ : sheaf X S} (φ : Mor 𝓕₁ 𝓕₂) (p : X) 
+  : ∃! φₚ : Mor (stalk 𝓕₁ p).1 (stalk 𝓕₂ p).1, 
+   ∀ O : opposite {O : Open X// p ∈ O}, ((stalk 𝓕₂ p).2 O) ∘ₘ (φ.map (op O.val)) = φₚ ∘ₘ ((stalk 𝓕₁ p).2 O) :=
+begin
+  have hcc : is_cocone (stalk_shape 𝓕₁ p) (natural_trans_im_cocone φ p),
+    intros O₁ O₂ i₂₁,
+    have hrw₁ : (stalk_shape 𝓕₁ p).fmap i₂₁ = 𝓕₁.body.fmap i₂₁ := rfl, 
+    have hrw₂ : (stalk_shape 𝓕₂ p).fmap i₂₁ = 𝓕₂.body.fmap i₂₁ := rfl,
+    rw [hrw₁,← comp_assoc,← φ.natural,comp_assoc],
+    have h𝓕₁ := (stalk_property 𝓕₂ p).1 ,
+    simp,
+    have hrw₄ : (stalk 𝓕₂ p).2 O₁ = ((stalk 𝓕₂ p).2 O₂) ∘ₘ 𝓕₂.body.fmap i₂₁,
+      cases stalk 𝓕₂ p,
+      apply h𝓕₁,
+    rw hrw₄,
+    refl,
+  -- what follows is mere abstract nonsense.
+  have hint := (stalk_property 𝓕₁ p).2 (natural_trans_im_cocone φ p) hcc,
+  rw natural_trans_im_cocone_map φ p at hint,
+  cases hint with φₚ hφₚ,
+  simp [natural_trans_im_cocone_obj] at hφₚ,
+  existsi φₚ,
+  exact hφₚ,
+end
+
+
 end sheaf
