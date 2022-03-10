@@ -145,4 +145,53 @@ def op_functor {C : Type u₁} {D : Type u₂} [SC:category.{v₁} C] [SD:catego
     end,
 }
 
+instance product_category (C D : Type u) [category.{v} C] [category.{v} D] : category.{v} (C × D) :=
+{
+  Mor := λ p₁ p₂, (Mor p₁.1 p₂.1) × (Mor p₁.2 p₂.2),
+  idₘ := λ p, ⟨idₘ p.1, idₘ p.2⟩,
+  comp := λ _ _ _ pf₁ pf₂, ⟨pf₁.1 ∘ₘ pf₂.1, pf₁.2 ∘ₘ pf₂.2⟩,
+  comp_assoc :=
+    begin
+      intros p₁ p₂ p₃ p₄ pf₁ pf₂ pf₃,
+      simp [comp_assoc],
+    end,
+  id_comp_right :=
+    begin
+      intros p₁ p₁ pf,
+      simp [id_comp_right],
+    end,
+  id_comp_left :=
+    begin
+      intros p₁ p₂ pf,
+      simp [id_comp_left],
+    end,
+}
+
+theorem prod_cat_id {C D : Type u} [category.{v} C] [category.{v} D]
+  : ∀ A : C × D, idₘ A = ⟨idₘ A.1, idₘ A.2⟩ := λ _, rfl 
+
+theorem prod_cat_comp {C D : Type u} [category.{v} C] [category.{v} D]
+  {A₁ A₂ A₃ : C × D} (pf₁ : Mor A₂ A₃) (pf₂ : Mor A₁ A₂) 
+  : pf₁ ∘ₘ pf₂ = ⟨pf₁.1 ∘ₘ pf₂.1, pf₁.2 ∘ₘ pf₂.2⟩ := rfl
+
+
+
+def product_functor {C₁ D₁ : Type u₁} {C₂ D₂ : Type u₂} [category.{v₁} C₁]
+  [category.{v₁} D₁] [category.{v₂} C₂] [category.{v₂} D₂] 
+  (F : C₁ +→ C₂) (G : D₁ +→ D₂) : (C₁ × D₁) +→ (C₂ × D₂) :=
+{
+  map := λ O, ⟨F.map O.1, G.map O.2⟩,
+  fmap := λ _ _ pf, ⟨F.fmap pf.1, G.fmap pf.2⟩,
+  fmap_prevs_id :=
+    begin
+      intro,
+      simp [prod_cat_id, functor.fmap_prevs_id],
+    end,
+  fmap_prevs_comp := 
+    begin
+      intros A₁ A₂ A₃ pf₁ pf₂,
+      simp [prod_cat_comp, functor.fmap_prevs_comp],
+    end,
+}
+
 end category
