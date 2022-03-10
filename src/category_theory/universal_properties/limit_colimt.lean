@@ -1,8 +1,6 @@
 import category_theory.basic
 import category_theory.instances
 
-
-
 universes v vᵢ vₒ u uᵢ uₒ
 
 open classical
@@ -21,6 +19,54 @@ def is_cocone {C: Type u} [category.{v} C] {I : Type uᵢ} [category.{vᵢ} I] (
 def is_colimit {C: Type u} [category.{v} C] {I : Type uᵢ} [category.{vᵢ} I] (F : I +→ C) 
   : (Σ cl : C, Π i : I, Mor (F.map i) cl) → Prop := 
   λ cᵤ, is_cocone F cᵤ ∧ ∀ c, is_cocone F c → ∃! φ : Mor cᵤ.1 c.1, ∀ i : I, c.2 i = φ ∘ₘ cᵤ.2 i    
+
+theorem colimits_essentially_unquie {C: Type u} [category.{v} C] {I : Type uᵢ} [category.{vᵢ} I] {F : I +→ C}
+  {cl₁ cl₂ : (Σ cl : C, Π i : I, Mor (F.map i) cl)} (hcl₁ : is_colimit F cl₁) (hcl₂ : is_colimit F cl₂)
+  : ∃! φ : Mor cl₁.1 cl₂.1, (isomorphism φ) ∧ (∀ i : I, cl₂.2 i = φ ∘ₘ cl₁.2 i) := 
+begin
+  cases cl₁ with cl₁ j₁,
+  cases cl₂ with cl₂ j₂,
+  cases hcl₁.2 ⟨cl₂,j₂⟩ hcl₂.1 with φ hφ,
+  dsimp at hφ,
+  cases hcl₂.2 ⟨cl₁,j₁⟩ hcl₁.1 with ψ hψ,
+  dsimp at hψ,
+  cases hcl₁.2 ⟨cl₁,j₁⟩ hcl₁.1 with idcl₁ hidcl₁,
+  dsimp at hidcl₁,
+  cases hcl₂.2 ⟨cl₂,j₂⟩ hcl₂.1 with idcl₂ hidcl₂,
+  dsimp at hidcl₂,
+  cases hφ with hφ uφ,
+  cases hψ with hψ uψ,
+  cases hidcl₁ with hidcl₁ uidcl₁,
+  cases hidcl₂ with hidcl₂ uidcl₂,
+  have hrw₁ : idₘ cl₁ = idcl₁,
+    apply uidcl₁,
+    intro,
+    rw id_comp_left,
+  have hrw₂ : idₘ cl₂ = idcl₂,
+    apply uidcl₂,
+    intro,
+    rw id_comp_left,
+  existsi φ,
+  split,
+  split,
+  existsi ψ,
+  dsimp,
+  split,
+  rw hrw₂,
+  apply uidcl₂,
+  intro,
+  rw [←comp_assoc,←hψ,←hφ],
+  rw hrw₁,
+  apply uidcl₁,
+  intro,
+  rw [←comp_assoc,←hφ,←hψ],
+  exact hφ,
+  dsimp,
+  intros φ' hφ',
+  apply uφ,
+  exact hφ'.2,
+end
+
 
 theorem isomorphisms_prev_colimits {C: Type u} [category.{v} C] {I : Type uᵢ} [category.{vᵢ} I] (F : I +→ C)
   {c₁: (Σ cl : C, Π i : I, Mor (F.map i) cl)} {c : C} {φ : Mor c₁.1 c} (hφ : isomorphism φ)
