@@ -5,10 +5,10 @@ import category_theory.universal_properties.limit_colimt
 
 universes v v₁ v₂ u u₁ u₂ 
 
+open classical
 open category
 open topology
 open set
-
 
 /-
   We have a category C with obj in Type u and mor in Type v, we'd like to think of C
@@ -125,7 +125,6 @@ instance sheaf_category {X : Type v} [topology X] {C : Type u} [category.{v} C] 
     end, 
 }
 
-
 noncomputable def natural_trans_im_cocone {X : Type v} [topology X] {C : Type u} [category.{v} C]
   {S : concrete_category C} {𝓕₁ 𝓕₂ : sheaf X S} (φ : Mor 𝓕₁ 𝓕₂) (p : X) 
   : Σ c : C, Π O : opposite {O : Open X // p ∈ O}, Mor (𝓕₁.body.map (op O.val)) c
@@ -140,8 +139,8 @@ theorem natural_trans_im_cocone_map {X : Type v} [topology X] {C : Type u} [cate
   : (natural_trans_im_cocone φ p).2 = λ O : opposite {O : Open X // p ∈ O}, ((stalk 𝓕₂ p).2 O)∘ₘ(φ.map (op O.val))
   := rfl
 
-theorem existance_of_induced_morphism_of_stalks {X : Type v} [topology X] {C : Type u} [category.{v} C]
-  (S : concrete_category C) {𝓕₁ 𝓕₂ : sheaf X S} (φ : Mor 𝓕₁ 𝓕₂) (p : X) 
+theorem existance_of_induced_morphism_of_stalks_nat {X : Type v} [topology X] {C : Type u} [category.{v} C]
+  {S : concrete_category C} {𝓕₁ 𝓕₂ : sheaf X S} (φ : Mor 𝓕₁ 𝓕₂) (p : X) 
   : ∃! φₚ : Mor (stalk 𝓕₁ p).1 (stalk 𝓕₂ p).1, 
    ∀ O : opposite {O : Open X// p ∈ O}, ((stalk 𝓕₂ p).2 O) ∘ₘ (φ.map (op O.val)) = φₚ ∘ₘ ((stalk 𝓕₁ p).2 O) :=
 begin
@@ -165,6 +164,64 @@ begin
   existsi φₚ,
   exact hφₚ,
 end
+
+noncomputable def induced_mor_of_stalks_nat {X : Type v} [topology X] {C : Type u} [category.{v} C]
+  {S : concrete_category C} {𝓕₁ 𝓕₂ : sheaf X S} (φ : Mor 𝓕₁ 𝓕₂) (p : X) : Mor (stalk 𝓕₁ p).1 (stalk 𝓕₂ p).1
+  := some (existance_of_induced_morphism_of_stalks_nat φ p)
+
+theorem induced_mor_of_stalks_nat_property {X : Type v} [topology X] {C : Type u} [category.{v} C]
+  {S : concrete_category C} {𝓕₁ 𝓕₂ : sheaf X S} (φ : Mor 𝓕₁ 𝓕₂) (p : X)
+  : (∀ O : opposite {O : Open X// p ∈ O}, ((stalk 𝓕₂ p).2 O) ∘ₘ (φ.map (op O.val)) 
+     = (induced_mor_of_stalks_nat φ p) ∘ₘ ((stalk 𝓕₁ p).2 O)) ∧ (∀ φₚ, (∀ O, ((stalk 𝓕₂ p).2 O) ∘ₘ (φ.map (op O.val)) 
+     = φₚ ∘ₘ ((stalk 𝓕₁ p).2 O)) → φₚ = (induced_mor_of_stalks_nat φ p)) 
+     := some_spec (existance_of_induced_morphism_of_stalks_nat φ p)
+
+theorem induced_mor_of_stalks_nat_compose {X : Type v} [topology X] {C : Type u} [category.{v} C]
+  {S : concrete_category C} {𝓕₁ 𝓕₂ 𝓕₃: sheaf X S} (φ₁ : Mor 𝓕₂ 𝓕₃) (φ₂ : Mor 𝓕₁ 𝓕₂) (p : X)
+  : induced_mor_of_stalks_nat (φ₁ ∘ₘ φ₂) p = (induced_mor_of_stalks_nat φ₁ p) 
+    ∘ₘ (induced_mor_of_stalks_nat φ₂ p) :=
+begin
+  symmetry,
+  apply (induced_mor_of_stalks_nat_property (φ₁ ∘ₘ φ₂) p).2,
+  intro,
+  cases induced_mor_of_stalks_nat_property φ₁ p with hrw₁ up₁,
+  cases induced_mor_of_stalks_nat_property φ₂ p with hrw₂ up₂,
+  rw [←comp_assoc, ←hrw₂, comp_assoc, ←hrw₁],
+  have hrw₃ : φ₁ ∘ₘ φ₂  = φ₁ ∘ₙ φ₂ := rfl,
+  simp [hrw₃,comp_assoc],
+end
+
+theorem induced_mor_of_stalks_nat_id {X : Type v} [topology X] {C : Type u} [category.{v} C]
+  {S : concrete_category C} (𝓕 : sheaf X S) (p : X) 
+  : induced_mor_of_stalks_nat (idₘ 𝓕) p = idₘ (stalk 𝓕 p).1 :=
+begin
+  symmetry,
+  apply (induced_mor_of_stalks_nat_property (idₘ 𝓕) p).2,
+  intro,
+  have hrw₁ : idₘ 𝓕 = idₙ 𝓕.body := rfl,
+  have hrw₂ : (idₙ 𝓕.body).map (op ↑(O.val)) = idₘ (𝓕.body.map (op ↑(O.val))) := rfl,
+  have hrw₃ : idₘ ((stalk_shape 𝓕 p).map O) = idₘ (𝓕.body.map (op ↑(O.val))) := rfl,
+  rw [hrw₁,hrw₂,← hrw₃,id_comp_left],
+  dsimp,
+  rw id_comp_right ((stalk 𝓕 p).2 O), 
+end
+
+noncomputable def stalk_of_nat_trans {X : Type v} [topology X] {C : Type u} [category.{v} C]
+  (S : concrete_category C) (p : X) : sheaf X S +→ C :=
+{
+  map := λ 𝓕, (stalk 𝓕 p).1,
+  fmap := λ _ _ φ, induced_mor_of_stalks_nat φ p,
+  fmap_prevs_comp :=
+    begin
+      intros 𝓕₁ 𝓕₂ 𝓕₃ φ₁ φ₂,
+      rw induced_mor_of_stalks_nat_compose,
+    end,
+  fmap_prevs_id :=
+    begin
+      intro 𝓕,
+      rw induced_mor_of_stalks_nat_id,
+    end,
+}
 
 
 end sheaf
