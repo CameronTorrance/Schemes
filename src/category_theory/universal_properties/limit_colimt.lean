@@ -167,8 +167,7 @@ structure concrete_category (C : Type u) [category.{v} C] :=
   {d : Σ dl : Type v, Π i : J, Mor ((val ⊚ F).map i) dl} (hc : is_colimit F c) 
   (hd : is_colimit (val ⊚ F) d), isomorphism (image_of_colimit_can_mor hc hd))
 
-theorem set_comp_app : ∀ {A₁ A₂ A₃ : Type u} (f₁ : Mor A₂ A₃) (f₂ : Mor A₁ A₂) (s : A₁), 
-  ((f₁ ∘ₘ f₂) : A₁ → A₃) s =  f₁ ( f₂ s) := λ _ _ _ _ _ _, rfl
+
 
 
 def f_colim_equiv {J : Type v} [category.{v} J] [nonempty J] (hJ : filtered_category J)
