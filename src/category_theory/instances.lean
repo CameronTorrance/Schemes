@@ -1,6 +1,6 @@
 import category_theory.basic
 
-universes v₁ v₂ v u₁ u₂ u
+universes v₁ v₂ v₃ v₄ v u₁ u₂ u₃ u₄ u
 
 namespace category
 
@@ -70,6 +70,9 @@ instance Type_Cat : category (Type u) :=
       refl,
     end,
 }
+
+theorem set_comp_app : ∀ {A₁ A₂ A₃ : Type u} (f₁ : Mor A₂ A₃) (f₂ : Mor A₁ A₂) (s : A₁), 
+  ((f₁ ∘ₘ f₂) : A₁ → A₃) s =  f₁ ( f₂ s) := λ _ _ _ _ _ _, rfl
 
 structure opposite (C : Type u) :=
   (val : C)
@@ -145,7 +148,8 @@ def op_functor {C : Type u₁} {D : Type u₂} [SC:category.{v₁} C] [SD:catego
     end,
 }
 
-instance product_category (C D : Type u) [category.{v} C] [category.{v} D] : category.{v} (C × D) :=
+instance product_category (C : Type u₁) (D : Type u₂) [category.{v₁} C] [category.{v₂} D] 
+  : category.{max v₁ v₂} (C × D) :=
 {
   Mor := λ p₁ p₂, (Mor p₁.1 p₂.1) × (Mor p₁.2 p₂.2),
   idₘ := λ p, ⟨idₘ p.1, idₘ p.2⟩,
@@ -167,17 +171,15 @@ instance product_category (C D : Type u) [category.{v} C] [category.{v} D] : cat
     end,
 }
 
-theorem prod_cat_id {C D : Type u} [category.{v} C] [category.{v} D]
+theorem prod_cat_id {C : Type u₁} {D : Type u₂} [category.{v₁} C] [category.{v₂} D]
   : ∀ A : C × D, idₘ A = ⟨idₘ A.1, idₘ A.2⟩ := λ _, rfl 
 
-theorem prod_cat_comp {C D : Type u} [category.{v} C] [category.{v} D]
+theorem prod_cat_comp {C : Type u₁} {D : Type u₂} [category.{v₁} C] [category.{v₂} D]
   {A₁ A₂ A₃ : C × D} (pf₁ : Mor A₂ A₃) (pf₂ : Mor A₁ A₂) 
   : pf₁ ∘ₘ pf₂ = ⟨pf₁.1 ∘ₘ pf₂.1, pf₁.2 ∘ₘ pf₂.2⟩ := rfl
 
-
-
-def product_functor {C₁ D₁ : Type u₁} {C₂ D₂ : Type u₂} [category.{v₁} C₁]
-  [category.{v₁} D₁] [category.{v₂} C₂] [category.{v₂} D₂] 
+def product_functor {C₁: Type u₁} {D₁ : Type u₂} {C₂ : Type u₃} {D₂ : Type u₄} [category.{v₁} C₁]
+  [category.{v₂} D₁] [category.{v₃} C₂] [category.{v₄} D₂] 
   (F : C₁ +→ C₂) (G : D₁ +→ D₂) : (C₁ × D₁) +→ (C₂ × D₂) :=
 {
   map := λ O, ⟨F.map O.1, G.map O.2⟩,

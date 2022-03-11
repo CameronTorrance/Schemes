@@ -72,6 +72,22 @@ def functor_comp {C₁ : Type u₁} {C₂ : Type u₂} {C₃ : Type u₃} [categ
 
 notation C ` ⊚ `:80 D:80 := functor_comp C D
 
+def id_func (C : Type u) [category.{v} C] : C +→ C :=
+{
+  map := id,
+  fmap := λ _ _, id,
+  fmap_prevs_comp :=
+    begin
+      intros A₁ A₂ A₃ f₁ f₂,
+      refl,
+    end,
+  fmap_prevs_id :=
+    begin
+      intro,
+      refl,
+    end,
+} 
+
 structure natural_transformation {C : Type u₁} {D : Type u₂} [category.{v₁} C] [category.{v₂} D] (F₁ F₂ : C +→ D) :=
   (map : Π c : C, Mor (F₁.map c) (F₂.map c))
   (natural : ∀ (c : C) {c' : C} (f : Mor c c'), (F₂.fmap f) ∘ₘ (map c)  = (map c') ∘ₘ (F₁.fmap f))
