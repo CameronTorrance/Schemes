@@ -167,9 +167,6 @@ structure concrete_category (C : Type u) [category.{v} C] :=
   {d : Σ dl : Type v, Π i : J, Mor ((val ⊚ F).map i) dl} (hc : is_colimit F c) 
   (hd : is_colimit (val ⊚ F) d), isomorphism (image_of_colimit_can_mor hc hd))
 
-
-
-
 def f_colim_equiv {J : Type v} [category.{v} J] [nonempty J] (hJ : filtered_category J)
   (F : J +→ Type v) : (Σ i : J, F.map i) → (Σ i : J, F.map i) → Prop  
   | ⟨i₁,s₁⟩ ⟨i₂,s₂⟩ := ∃ (k : J) (f₁ : Mor i₁ k) (f₂ : Mor i₂ k), F.fmap f₁ s₁ = F.fmap f₂ s₂
@@ -354,6 +351,5 @@ theorem filtered_colimit_property {C : Type u} [category.{v} C] {J : Type v} [ca
   [nonempty J] (hJ : filtered_category J) (S : concrete_category C) (F : J +→ C)
   : is_colimit F (filtered_colimit hJ S F)
   := some_spec (concrete_category_has_filtered_colimits hJ S F)
-
 
 end category

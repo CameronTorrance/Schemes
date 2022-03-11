@@ -148,8 +148,6 @@ begin
   refl,
 end
 
-def natural_isomorphism {C : Type u₁} {D : Type u₂} [category.{v₁} C] [category.{v₂} D] {F₁ F₂ : C +→ D} 
-  (φ : F₁ →ₙ F₂) : Prop := ∃ ψ : F₂ →ₙ F₁, φ ∘ₙ ψ = idₙ F₂ ∧ ψ ∘ₙ φ = idₙ F₁    
 
 def isomorphism {C : Type u} [category.{v} C] {A B : C} : Mor A B → Prop 
   := λ f, ∃ g : Mor B A, f ∘ₘ g = idₘ B ∧ g ∘ₘ f = idₘ A 

@@ -45,11 +45,14 @@ def insert_fuctor_in_mor_right {C₁ : Type u₁} {C₂ : Type u₂} [category.{
   := (morphism_bifunctor C₁) ⊚ ((product_functor (op_functor (id_func C₁)) F)
     : (opposite C₁ × C₂) +→ (opposite C₁ × C₁))
 
-def adjunction {C₁ : Type u₁} {C₂ : Type u₂} [category.{v} C₁] [category.{v} C₂]
-  (F : C₂ +→ C₁) (G : C₁ +→ C₂) 
-  :  Prop
-  := ∃ φ : Mor (insert_fuctor_in_mor_left F) (insert_fuctor_in_mor_right G) , isomorphism φ
+structure adjunction {C₁ : Type u₁} {C₂ : Type u₂} [category.{v} C₁] [category.{v} C₂]
+  (F : C₂ +→ C₁) (G : C₁ +→ C₂) := 
+  (body: Mor (insert_fuctor_in_mor_left F) (insert_fuctor_in_mor_right G)) 
+  (iso : isomorphism body)
 
 infix ` ⊣ `:15 := adjunction
+
+def adj_counit {C₁ : Type u₁} {C₂ : Type u₂} [category.{v} C₁] [category.{v} C₂]  
+  {F : C₂ +→ C₁} {G : C₁ +→ C₂} (φ : F ⊣ G) : F ⊚ G →ₙ (id_func C₁)
 
 end category
