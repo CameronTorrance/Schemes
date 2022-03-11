@@ -43,6 +43,10 @@ instance functor_category (C : Type u₁) (D : Type u₂) [category.{v₁} C] [c
     end,
 }
 
+@[simp]
+theorem functor_cat_comp {C : Type u₁} {D : Type u₂} [category.{v₁} C] [category.{v₂} D]
+  {F₁ F₂ F₃ : C +→ D} (φ₁ : Mor F₂ F₃) (φ₂ : Mor F₁ F₂) : φ₁ ∘ₘ φ₂ = φ₁ ∘ₙ φ₂ := rfl
+
 instance Type_Cat : category (Type u) :=
 {
   Mor := λ A B : Type u, A → B,

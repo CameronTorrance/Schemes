@@ -148,7 +148,6 @@ begin
   refl,
 end
 
-
 def isomorphism {C : Type u} [category.{v} C] {A B : C} : Mor A B → Prop 
   := λ f, ∃ g : Mor B A, f ∘ₘ g = idₘ B ∧ g ∘ₘ f = idₘ A 
 
