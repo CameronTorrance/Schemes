@@ -104,6 +104,20 @@ begin
   rw [mul_comm a b,mul_comm (-a) b,← mul_dis,minus_inverse,mul_zero],
 end
 
+lemma mul_assoc₄ {R : Type u} [comm_ring R]: ∀ r₁ r₂ r₃ r₄ : R ,
+   r₁ * r₂ * (r₃ * r₄) = r₁ * (r₂ * r₃) * r₄ :=
+begin
+  intros r₁ r₂ r₃ r₄,
+  simp[mul_assoc],
+end
+
+lemma add_assoc₄ {R : Type u} [comm_ring R]: ∀ r₁ r₂ r₃ r₄ : R ,
+   r₁ + r₂ + (r₃ + r₄) = r₁ + (r₂ + r₃) + r₄ :=
+begin
+  intros r₁ r₂ r₃ r₄,
+  simp[add_assoc],
+end
+
 theorem minus_minus {R : Type u} [comm_ring R] : ∀ x : R , -(-x) = x :=
 begin
   intro x,

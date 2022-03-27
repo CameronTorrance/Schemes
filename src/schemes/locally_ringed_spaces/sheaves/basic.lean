@@ -1,7 +1,7 @@
 import topology.basic
 import category_theory.basic
 import category_theory.instances
-import category_theory.universal_properties.limit_colimt
+import category_theory.universal_properties.colimit
 
 universes v v₁ v₂ u u₁ u₂ 
 
@@ -14,7 +14,6 @@ open set
   We have a category C with obj in Type u and mor in Type v, we'd like to think of C
   as being at least locally small so we will of v as being the level of sets.
 
-  A 
 -/
 
 def inc_to_mor {X : Type u} [topology X] {O₁ O₂ : Open X} : inclusion O₁ O₂ → inclusion (op O₁).val (op O₂).val :=
