@@ -21,6 +21,8 @@ def pos_nat_mul : ℕ⁺ → ℕ⁺ → ℕ⁺
 
 instance pos_nat_has_mul : has_mul ℕ⁺ := ⟨pos_nat_mul⟩
 
+theorem pos_nat_mul_suc : ∀ n m : ℕ⁺, (pos_nat.succ n) * m = m + (n * m) := λ _ _, rfl
+
 theorem pos_nat.one_mul : ∀ n : ℕ⁺, pos_nat.one * n = n := λ _,rfl
 
 def pot_nat_to_int :  ℕ⁺ → ℤ 
@@ -35,6 +37,9 @@ theorem coe_pos_one : ↑(pos_nat.one) = (1:ℤ) := rfl
 @[simp]
 theorem coe_pos_suc : ∀ n : ℕ⁺, ↑(pos_nat.succ n) = (1 + ↑n : ℤ) := λ _, rfl
 
+
+
+
 theorem pos_nat_nat_coor : ∀ n : ℕ⁺, ∃ m : ℕ, ↑n = int.of_nat m :=
 begin
   intro n,
@@ -45,6 +50,8 @@ begin
   existsi nat.succ m,
   simp[hm,int.of_nat_succ,int.add_comm],
 end
+
+
 
 theorem coe_prevs_add : ∀ n₁ n₂ : ℕ⁺, (↑(n₁ + n₂) : ℤ) = ↑n₁ + ↑n₂ :=
 begin
@@ -247,32 +254,5 @@ begin
     simp[← comm_ring.minus_mul,hrw₁],
   exact hrw₃,
 end
-
-instance rational_has_neg : has_neg ℚ := ⟨rational_minus⟩
-instance rational_has_sub : has_sub ℚ := ⟨λ x y, x + -y⟩  
-
-theorem rational_minus_concrete_char : ∀ (z : ℤ) (n : ℕ⁺), (-⟦(z,n)⟧ : ℚ) = ⟦(-z,n)⟧ := λ _ _, rfl
-
-def pre_le_rational : ℤ × ℕ⁺ → ℤ × ℕ⁺ → Prop
-| (z₁,n₁) (z₂,n₂) := z₁ * n₂ ≤ z₂ * n₁
-
-def le_rational : ℚ → ℚ → Prop :=
-begin
-  apply quotient.lift₂ pre_le_rational,
-  intros ap₁ ap₂ bp₁ bp₂ r₁ r₂,
-  cases ap₁ with az₁ an₁,
-  cases ap₂ with az₂ an₂,
-  cases bp₁ with bz₁ bn₁,
-  cases bp₂ with bz₂ bn₂, 
-  have hrw₁ : az₁ * bn₁ = bz₁ * an₁,
-    exact r₁,
-  have hrw₂ : az₂ * bn₂ = bz₂ * an₂,
-    exact r₂,
-    simp[pre_le_rational],
-    sorry,
-end
-
-instance rational_has_le : has_le ℚ := ⟨le_rational⟩ 
-
 
 end rational

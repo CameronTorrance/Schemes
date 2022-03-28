@@ -1,0 +1,7 @@
+
+
+namespace rational
+
+
+
+end rational
