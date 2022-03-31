@@ -185,6 +185,18 @@ def nat_to_ring (R :Type u) [comm_ring R] : ℕ → R
   | 0            := 0
   | (nat.succ n) := 1 + nat_to_ring n 
 
+
+theorem minus_inj {R : Type u} [comm_ring R] : ∀ {x y : R}, -x = -y → x = y :=
+begin
+  intros x y h,
+  exact calc x = x + 0 : by rw add_zero 
+           ... = x + (y + -y) : by rw ← minus_inverse 
+           ... = x + (-y + y) : by rw add_comm y 
+           ... = (x + -x) + y : by rw [← h, add_assoc]
+           ... = 0 + y        : by rw [minus_inverse]
+           ... = y            : by rw [add_comm,add_zero],
+end
+
 def sum_list {R : Type u} [comm_ring R] : list R → R := foldr (λ a b : R, a + b) 0
 
 def scale_list {R : Type u} [comm_ring R] : R → list R → list R := λ a, map (λ b: R, a * b)
