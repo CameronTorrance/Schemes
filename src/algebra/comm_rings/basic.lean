@@ -197,6 +197,12 @@ begin
            ... = y            : by rw [add_comm,add_zero],
 end
 
+theorem add_midpoint {R : Type u} [comm_ring R] : ∀ (y x z : R), x + -z = (x + -y) + (y + -z) :=
+begin
+  intros y x z,
+  rw [add_assoc₄,add_comm (-y),minus_inverse,add_zero],
+end
+
 def sum_list {R : Type u} [comm_ring R] : list R → R := foldr (λ a b : R, a + b) 0
 
 def scale_list {R : Type u} [comm_ring R] : R → list R → list R := λ a, map (λ b: R, a * b)
@@ -278,8 +284,6 @@ def ring_hom_comp {R₁ : Type u} {R₂ : Type v} {R₃ : Type w}[comm_ring R₁
 
 infixr ` ∘ᵣ ` : 25 := ring_hom_comp
 
-
-
 theorem ring_hom_preserves_zero {R₁ : Type u} {R₂ : Type v} [l₁ :comm_ring R₁] [l₂:comm_ring R₂] (φ : R₁ →ᵣ R₂) : φ 0 = 0 :=
 begin
   have sub : φ 0 = φ 0 + φ 0,
@@ -359,11 +363,9 @@ begin
   refl,
 end
 
-
 /-
   showing that a bijective ring hom is an isomorphism.
 -/
-
 
 theorem inverse_prevs_one {R₁ : Type u} {R₂ : Type v} [comm_ring R₁] [comm_ring R₂] {φ : R₁ →ᵣ R₂} {g : R₂ → R₁} 
   : inverse g ⇑φ → g 1 = 1 := 
@@ -435,7 +437,5 @@ begin
   rw [trv₂,trv₁,hg₁],
   refl,
 end
-
-
 
 end comm_ring

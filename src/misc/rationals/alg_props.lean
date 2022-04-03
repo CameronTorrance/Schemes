@@ -174,4 +174,20 @@ begin
   simp[int.zero_mul],
 end
 
+lemma mul_two_div_rat_by_two : ∀ (n : ℕ) (m : ℕ⁺), ⟦(int.of_nat n, m)⟧ = 
+  (⟦(int.of_nat n, m*2)⟧ + ⟦(int.of_nat n, m*2)⟧ : ℚ) :=
+begin
+  intros n m,
+  rw [rational_add_concrete_char,← int.distrib_right],
+  rw fraction_cancel,
+  have hrw : int.of_nat n + int.of_nat n = (int.of_nat n) * ↑(2:ℕ⁺),
+    have sub₁ : ↑(2:ℕ⁺) = (2:ℤ) := rfl,
+    rw sub₁,
+    rw int.mul_comm,
+    have sub₂ : 2 = int.of_nat 2 := rfl, 
+    simp[← int.of_nat_add,sub₂,← int.of_nat_mul,nat.succ_mul,nat.zero_mul,nat.zero_add],
+    rw [hrw,fraction_cancel],
+end
+
+
 end rational
