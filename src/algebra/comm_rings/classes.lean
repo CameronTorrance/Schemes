@@ -17,4 +17,8 @@ class local_ring (R : Type u) [comm_ring R] :=
   (only_one_maximal_ideal : ∀ m : MaxSpec R, m = unquie_maximal_ideal)
 
 
+class field (R : Type u) [comm_ring R] :=
+  (non_zero_implies_unit : ∀ {x : R}, x ≠ 0 → unit x)
+
+
 end comm_ring
