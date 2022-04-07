@@ -1,5 +1,6 @@
 import misc.rationals.basic
 
+
 namespace rational
 
 theorem add_zero : ∀ r : ℚ, r + 0 = r :=

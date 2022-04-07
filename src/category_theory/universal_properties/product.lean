@@ -1,7 +1,10 @@
 import category_theory.basic
 import category_theory.instances
+import category_theory.universal_properties.colimit
+import misc.graph
+import misc.matrix
 
-universes v u uᵢ
+universes v u vᵢ uᵢ
 
 namespace category
 
@@ -75,7 +78,22 @@ class has_products (C : Type u) [category.{v} C]
 (all_products_exist : ∀ {I : Type uᵢ} (f : I → C) ,∃ p : (Σ p : C, Π i : I, Mor p (f i)), 
   is_product f p)
 
+def equaliser_edge : index.{u} 2 → index.{u} 2 → Type v
+| index.zero (index.succ (index.zero)) := index 2
+| _ _                                  := index 0
 
+
+def equaliser_graph : graph.{v u} :=
+{
+  vertex_set := index.{u} 2,
+  edge_set := equaliser_edge,
+}
+
+
+def is_limit {C : Type u} [category.{v} C] {I : Type uᵢ} [category.{vᵢ} I] 
+  (F : I +→ C) : (Σ p : C, Π i : I, Mor p (F.map i) ) → Prop 
+| ⟨p,j⟩ := is_colimit (op_functor F) 
+  ⟨op p, Π i : (opposite I), ((j i.val) : Mor (op (F.map i.val)) (op p))⟩    
 
 
 

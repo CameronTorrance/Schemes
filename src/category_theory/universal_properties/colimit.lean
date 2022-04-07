@@ -18,7 +18,7 @@ def is_cocone {C: Type u} [category.{v} C] {I : Type uᵢ} [category.{vᵢ} I] (
 
 def is_colimit {C: Type u} [category.{v} C] {I : Type uᵢ} [category.{vᵢ} I] (F : I +→ C) 
   : (Σ cl : C, Π i : I, Mor (F.map i) cl) → Prop := 
-  λ cᵤ, is_cocone F cᵤ ∧ ∀ c, is_cocone F c → ∃! φ : Mor cᵤ.1 c.1, ∀ i : I, c.2 i = φ ∘ₘ cᵤ.2 i    
+  λ cᵤ, is_cocone F cᵤ ∧ ∀ c, is_cocone F c → ∃! φ : Mor cᵤ.1 c.1, ∀ i : I, c.2 i = φ ∘ₘ cᵤ.2 i   
 
 theorem colimits_essentially_unquie {C: Type u} [category.{v} C] {I : Type uᵢ} [category.{vᵢ} I] {F : I +→ C}
   {cl₁ cl₂ : (Σ cl : C, Π i : I, Mor (F.map i) cl)} (hcl₁ : is_colimit F cl₁) (hcl₂ : is_colimit F cl₂)
@@ -154,6 +154,10 @@ theorem image_of_colimit_can_mor_property {C : Type u} [category.{v} C] {D : Typ
   : (∀ i : J, (image_of_colimit G c).2 i = (image_of_colimit_can_mor hc hd) ∘ₘ (d.2 i)) ∧ (∀ ϕ : Mor d.1 (image_of_colimit G c).1,
   (∀ i : J, (image_of_colimit G c).2 i = ϕ ∘ₘ (d.2 i)) → ϕ = (image_of_colimit_can_mor hc hd)) 
   := some_spec (exists_image_of_colimit_can_mor hc hd)
+
+
+class has_small_filtered_colimits (C : Type u) [category.{v} C] :=
+(colimits_exist : ∀ {J : Type v} [category.{v} J] [nonempty J] (F : J +→ C), ∃ c, is_colimit F c) 
 
 structure concrete_category (C : Type u) [category.{v} C] :=
   (val : C +→ Type v)
