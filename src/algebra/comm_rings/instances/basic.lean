@@ -225,7 +225,18 @@ def int_hom_map (R : Type u) [comm_ring R] : ℤ → R
 
 lemma int_hom_of_nat {R : Type u} [comm_ring R] : ∀ {n : ℕ}, int_hom_map R (int.of_nat n) = nat_to_ring R n := λ _, rfl
 
-theorem int_hom_prevs_zero {R : Type u} [lR:comm_ring R] : int_hom_map R int.zero = lR.zero := rfl
+theorem int_hom_prevs_zero {R : Type u} [lR:comm_ring R] : int_hom_map R 0 = lR.zero := rfl
+
+theorem int_hom_prevs_mul {R : Type u} [comm_ring R] : ∀ x y : ℤ , int_hom_map R (x * y) 
+  =  (int_hom_map R x) * (int_hom_map R y) :=
+begin
+  intros x y,
+  induction x with z hz,
+  induction z with n hn,
+  simp[int_hom_prevs_zero,int.of_nat_zero,int.zero_mul],
+  rw [mul_comm,mul_zero],
+
+end
 
 inductive zero_ring : Type
   | elm : zero_ring
@@ -236,8 +247,6 @@ begin
   cases x,
   refl,
 end
-
-
 
 instance zero_ring_is_ring : comm_ring zero_ring :=
   {

@@ -1,5 +1,6 @@
 import algebra.comm_rings.basic
 import algebra.comm_rings.ideals.basic
+import misc.rationals.pos_nat
 
 open classical
 
