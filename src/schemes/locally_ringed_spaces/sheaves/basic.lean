@@ -190,7 +190,7 @@ theorem induced_mor_of_stalks_nat_property {X : Type v} [topology X] {C : Type u
      (∀ φₚ, (∀ O, ((stalk 𝓕₂ p).2 O) ∘ₘ (φ.map (op O.val)) = φₚ ∘ₘ ((stalk 𝓕₁ p).2 O)) 
      → φₚ = (induced_mor_of_stalks_nat φ p)) := some_spec (existance_of_induced_morphism_of_stalks_nat φ p)
 
-theorem induced_mor_of_stalk's_nat_compose {X : Type v} [topology X] {C : Type u} [category.{v} C]
+theorem induced_mor_of_stalks_nat_compose {X : Type v} [topology X] {C : Type u} [category.{v} C]
   [has_products.{v u v} C] [has_small_filtered_colimits C] {𝓕₁ 𝓕₂ 𝓕₃: sheaf X C} (φ₁ : Mor 𝓕₂ 𝓕₃) 
   (φ₂ : Mor 𝓕₁ 𝓕₂) (p : X) : induced_mor_of_stalks_nat (φ₁ ∘ₘ φ₂) p = (induced_mor_of_stalks_nat φ₁ p) 
     ∘ₘ (induced_mor_of_stalks_nat φ₂ p) :=
@@ -205,7 +205,7 @@ begin
   simp [hrw₃,comp_assoc],
 end
 
-theorem induced_mor_of_stalk's_nat_id {X : Type v} [topology X] {C : Type u} [category.{v} C]
+theorem induced_mor_of_stalks_nat_id {X : Type v} [topology X] {C : Type u} [category.{v} C]
   [has_products.{v u v} C] [has_small_filtered_colimits C] (𝓕 : sheaf X C) (p : X) 
   : induced_mor_of_stalks_nat (idₘ 𝓕) p = idₘ (stalk 𝓕 p).1 :=
 begin
@@ -220,7 +220,7 @@ begin
   rw id_comp_right ((stalk 𝓕 p).2 O), 
 end
 
-noncomputable def stalk'_of_nat_trans {X : Type v} [topology X] (C : Type u) [category.{v} C]
+noncomputable def stalk_of_nat_trans {X : Type v} [topology X] (C : Type u) [category.{v} C]
   [has_products.{v u v} C]
   [has_small_filtered_colimits C] (p : X) : sheaf X C +→ C :=
 {
@@ -229,12 +229,12 @@ noncomputable def stalk'_of_nat_trans {X : Type v} [topology X] (C : Type u) [ca
   fmap_prevs_comp :=
     begin
       intros 𝓕₁ 𝓕₂ 𝓕₃ φ₁ φ₂,
-      rw induced_mor_of_stalk's_nat_compose,
+      rw induced_mor_of_stalks_nat_compose,
     end,
   fmap_prevs_id :=
     begin
       intro 𝓕,
-      rw induced_mor_of_stalk's_nat_id,
+      rw induced_mor_of_stalks_nat_id,
     end,
 }
 
