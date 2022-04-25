@@ -101,7 +101,7 @@ def sum₂₅₇5 (l: list ℕ) : option ℕ :=
   Add metaconstants -- to the axiomatic foundation are just opaque constants but when the
   bytecode is evaluates them they are assoicted with internally defn gadgets. 
 
-  A example is tactic_state which represents the internal elaborator state i the contex where
+  An example is tactic_state which represents the internal elaborator state in the contex where
   the tatic is invoked. 
 
   The metaprogramming API provides access to fns that operate on these. 
@@ -137,3 +137,5 @@ def sum₂₅₇5 (l: list ℕ) : option ℕ :=
   the nats are de brujin indies, lconst/mvar should never be in any proof terms.
 
 -/
+
+

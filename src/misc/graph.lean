@@ -1,4 +1,5 @@
 import category_theory.basic
+import misc.matrix
 
 universes v u
 
@@ -151,6 +152,12 @@ def shape {Γ : graph.{v u}} {C : Type u} [category.{v} C] (φ : Mor Γ (categor
       simp[image_path,path_to_mor,p₁_ih,path_cat_step_comp],
       rw comp_assoc,
     end,
+}
+
+def matrix_to_graph {n : ℕ} (M : matrix ℕ n n) : graph.{v u} :=
+{
+  vertex_set := index n,
+  edge_set := λ i₁ i₂, index (M.entry i₁ i₂),
 }
 
 end graph

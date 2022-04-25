@@ -114,7 +114,18 @@ begin
 end 
 
 def open_cover_of {X : Type u} [topology X] (C : set (Open X)) (S : Open X)
-  : Prop := (∀ {U : Open X} , U ∈ C → U.val ⊆ S.val) ∧ (∀ {x}, x ∈ S.val → ∃ U : Open X, U ∈ C ∧ x ∈ S.val)
+  : Prop := (∀ {U : Open X} , U ∈ C → U.val ⊆ S.val) ∧ (∀ {x}, x ∈ S.val → ∃ U : Open X, U ∈ C ∧ x ∈ U.val)
+
+def is_open_cover {X : Type u} [topology X] {I : Type u} (f : I → Open X) (S : Open X) : Prop :=
+  (∀ i : I, (f i).val ⊆ S.val) ∧ (∀ {x}, x ∈ S → ∃ i, x ∈ (f i))
+
+def is_open_cover_includes {X : Type u} [topology X] {I : Type u} {f : I → Open X} {S : Open X}
+  (hf : is_open_cover f S) : Π i, inclusion (f i) S :=
+begin
+  intro i,
+  apply inclusion.proof,
+  apply hf.1,
+end
 
 def open_cover_includes {X : Type u} [topology X] {C : set (Open X)} {S : Open X}
   (hC : open_cover_of C S)  : Π {O}, O ∈ C → inclusion O S :=

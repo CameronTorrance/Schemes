@@ -157,19 +157,18 @@ theorem image_of_colimit_can_mor_property {C : Type u} [category.{v} C] {D : Typ
 
 
 class has_small_filtered_colimits (C : Type u) [category.{v} C] :=
-(colimits_exist : ∀ {J : Type v} [category.{v} J] [nonempty J] (F : J +→ C), ∃ c, is_colimit F c) 
+(colimits_exist : ∀ {J : Type v} [category.{v} J] [nonempty J] (hJ : filtered_category J)
+  (F : J +→ C), ∃ c, is_colimit F c) 
 
-structure concrete_category (C : Type u) [category.{v} C] :=
-  (val : C +→ Type v)
-  (property : faithful_functor val)
-  (up_colimits_iff_down_colimits : ∀ {J : Type v} [category.{v} J] [nonempty J] 
-  (hJ : filtered_category J) {F : J +→ C},
-  (∃ c : (Σ cl : C, Π i : J, Mor (F.map i) cl), is_colimit F c) ↔ 
-  (∃ d : (Σ dl : Type v, Π i : J, Mor ((val ⊚ F).map i) dl), is_colimit (val ⊚ F) d))
-  (colimit_can_iso : ∀ {J : Type v} [category.{v} J] [nonempty J] 
-  (hJ : filtered_category J) {F : J +→ C} {c : Σ cl : C, Π i : J, Mor (F.map i) cl} 
-  {d : Σ dl : Type v, Π i : J, Mor ((val ⊚ F).map i) dl} (hc : is_colimit F c) 
-  (hd : is_colimit (val ⊚ F) d), isomorphism (image_of_colimit_can_mor hc hd))
+noncomputable def filtered_colimit {C : Type u} [category.{v} C] [has_small_filtered_colimits C] 
+  {J : Type v} [category.{v} J] [nonempty J] (hJ : filtered_category J) (F : J +→ C)
+  : (Σ cl : C, Π i : J, Mor (F.map i) cl) 
+  := some (has_small_filtered_colimits.colimits_exist hJ F)
+
+theorem filtered_colimit_property {C : Type u} [category.{v} C] [has_small_filtered_colimits C] 
+  {J : Type v} [category.{v} J] [nonempty J] (hJ : filtered_category J) (F : J +→ C)
+  : is_colimit F (filtered_colimit hJ F)
+  := some_spec (has_small_filtered_colimits.colimits_exist hJ F)
 
 def f_colim_equiv {J : Type v} [category.{v} J] [nonempty J] (hJ : filtered_category J)
   (F : J +→ Type v) : (Σ i : J, F.map i) → (Σ i : J, F.map i) → Prop  
@@ -332,28 +331,5 @@ begin
   rw hψ i,
   refl,
 end
-
-theorem concrete_category_has_filtered_colimits {C : Type u} [category.{v} C] {J : Type v} [category.{v} J] 
-  [nonempty J] (hJ : filtered_category J) (S : concrete_category C) (F : J +→ C) 
-  : ∃ c : (Σ cl : C, Π i : J, Mor (F.map i) cl), is_colimit F c := 
-begin
-  cases S with S Sfaithful Sexist Scaniso,
-  let setcolimit := filtered_colimit_set hJ (S ⊚ F),
-  have setcolimit_colimit : is_colimit (S ⊚ F) setcolimit := filtered_colimit_set_colimit hJ (S ⊚ F),
-  rw Sexist,
-  existsi setcolimit,
-  exact setcolimit_colimit,
-  exact hJ,
-end
-
-noncomputable def filtered_colimit {C : Type u} [category.{v} C] {J : Type v} [category.{v} J] 
-  [nonempty J] (hJ : filtered_category J) (S : concrete_category C) (F : J +→ C)
-  : (Σ cl : C, Π i : J, Mor (F.map i) cl) 
-  := some (concrete_category_has_filtered_colimits hJ S F)
-
-theorem filtered_colimit_property {C : Type u} [category.{v} C] {J : Type v} [category.{v} J] 
-  [nonempty J] (hJ : filtered_category J) (S : concrete_category C) (F : J +→ C)
-  : is_colimit F (filtered_colimit hJ S F)
-  := some_spec (concrete_category_has_filtered_colimits hJ S F)
 
 end category
